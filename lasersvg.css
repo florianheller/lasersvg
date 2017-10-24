@@ -1,0 +1,30 @@
+#svg-container {
+	width: 800px;
+  height: 500px;
+	border-width: 1px;
+	border-color: #384C6C;
+	border-style: solid;
+	background-color: #F5F6F8;
+}
+
+#svg-container svg {
+	border-width: 1px;
+	border-color: #000;
+	border-style: solid;
+}
+
+#inner {
+	fill:#A9CE38;
+	stroke: #384C6C;
+}
+
+circ:nth-child(2n+1) {
+	stroke-width:7px;
+}
+#triangle {
+	fill: none;
+	stroke: #384C6C;
+}
+path:nth-child(n+1) {
+	stroke-width:7px;
+}
