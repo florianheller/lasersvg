@@ -1,37 +1,38 @@
-function updateThickness(scalingFactor) {
+function updateThickness(materialThickness) {
 	// Show the materialThickness 
 	var factorDisplay = document.getElementById('materialThickness');
-  factorDisplay.innerHTML = scalingFactor;
+  	factorDisplay.innerHTML = materialThickness;
 	//Scale the objects
 	
-	//var benchPlank = document.getElementById("benchPlank")
-	var draw = SVG.get("drawing");
-	var defs = draw.defs();
-	var plank = defs.first();
-	window.alert(plank)
-	//var benchPlank = defs.get("benchPlank");
+	var drawingObject = document.getElementById('drawingObject');
 
-	//benchPlank.setProperty("--matWidth", scalingFactor);
 	// Iterate over all objects in the SVG
-	var drawing = document.getElementById("drawing");
-	// First the rectangles
-	var rects = drawing.getElementsByTagName("rect") ;
-	for (var i=0; i<rects.length; i++) {
-		var element = rects[i];
-		if (element.classList.contains('material-width')) {
-			//only scale heigth
-			// TODO: this shouldn't be 1, but the existing scaling factor
-			var attribute = "scale(1 , " + scalingFactor + ")";
-			element.setAttribute("transform", attribute);		
+	var svgDrawing = drawingObject.contentDocument;
+	var elements = svgDrawing.querySelectorAll('*');
+	//var rects = svgDrawing.getElementsByTagName("rect");
+	for (var i=0; i<elements.length; i++) {
+		var element = elements[i];
+		// Check if it has a material thickness attribute
+		if (element.hasAttribute('laser:material-thickness')) {
+			var thickness = element.getAttribute('laser:material-thickness');
+			switch (thickness) {
+				case 'width': element.setAttribute("width", materialThickness); break; 
+				case 'height': element.setAttribute("height", materialThickness); break; 
+				case 'both': element.setAttribute("height", materialThickness); element.setAttribute("width", materialThickness); break;
+				default: break; // Results to none
+			}
 		}
-		else if (element.classList.contains('material-height')) {
-			//only scale heigth
-			element.setAttribute("transform","scale(" + scalingFactor +", 1)");
+		// Check if the element has a template attribute
+		if (element.hasAttribute('laser:template')) {
+			var template = element.getAttribute('laser:template');
+			var newTemplate = template.replace(/[{]thick[}]/g,materialThickness);
+			element.setAttribute("d",newTemplate);
+
 		}
 	}
-	//if ( element.classList.contains('materialWidth') )
-
 }
+
+
 function updateScaling(scalingFactor) {
 	// Show the scaling factor
 	var factorDisplay = document.getElementById('scalingFactor');
