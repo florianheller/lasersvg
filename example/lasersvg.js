@@ -64,19 +64,14 @@ function updateScaling(scalingFactor) {
 	var drawingObject = document.getElementById('drawingObject');
 	var svgDrawing = drawingObject.contentDocument;
 	
-	// Only apply this to 
-	var elements = svgDrawing.querySelectorAll('*, :not(svg) :not(defs) :not(desc) :not(title)');
+	//TODO: this is not functional as of now.
+	var elements = svgDrawing.querySelectorAll('use');
 	for (var i=0; i<elements.length; i++) {
 		var element = elements[i];
 		var attribute = "scale(" + scalingFactor + ")";
 		element.setAttribute("transform", attribute);
 	}
 }
-
-function zoom() {
-        var circle = document.getElementById('inner');
-    }
-// Will be called onLoad
 
 
 document.getElementById("scalingSlider").onchange = function() {
