@@ -1,3 +1,11 @@
+<!--
+    LaserSVG sample file to illustrate the features
+    Author: Florian Heller florian.heller<at>uhasselt.be
+    Copyright: C2017 
+    
+    http://github.com/florianheller/lasersvg
+    http://www.heller-web.net/lasersvg
+-->
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg width="100%" height="100%" viewBox="0 0 260 52" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:laser="http://www.heller-web.net/lasersvg" id="drawing">
 
