@@ -1,5 +1,5 @@
-# LaserSVG
-![LaserSVG Logo](/docs/LaserSVG.svg){:width="50px"} LaserSVG is an extension to the SVG file format to make it more suitable for the exchange of templates for laser-cutting. LaserSVG integrates two main features: marking edges as being of material width, and marking edges as being the inside or the outside of a press-fit joint.
+# LaserSVG 
+<img align="right" src="/docs/LaserSVG.svg" width="50px" alt="LaserSVG Logo"> LaserSVG is an extension to the SVG file format to make it more suitable for the exchange of templates for laser-cutting. LaserSVG integrates two main features: marking edges as being of material width, and marking edges as being the inside or the outside of a press-fit joint.
 
 
 ## Namespace
