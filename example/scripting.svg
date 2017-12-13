@@ -8,69 +8,48 @@
     http://www.heller-web.net/lasersvg
 -->
 <svg width="500" height="150"  version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:laser="http://www.heller-web.net/lasersvg" id="drawing">
-	<rect width="400" height="100" x="10" y="10" style="fill:rgb(0,0,255);stroke-width:1;stroke:rgb(0,0,0)" id="baseRect" />
+	<rect width="400" height="100" x="10" y="10" style="fill:#E1E4E9;stroke-width:1;stroke:#A9CE38" id="baseRect" />
 	<script type="text/javascript">
 	<![CDATA[
-		// set element onclick event handler
-        var svgColor1 = "#0000ff";
-        var svgColor2 = "#ff0000";
-		
-		window.onload=function () {
-
-        	var rect = document.getElementById("baseRect");
-
-        	// onclick event handler, change circle radius
-        	rect.onclick = function() {
-    	    	if (this.style.fill == "rgb(255, 0, 0)") {
-        			this.style.fill = svgColor1;
-        		} else {
-           	 		this.style.fill = svgColor2;
-           		}
-        	}
-    	}
-
-    	//This is the variable we expose to the user-Agent
+	   	//This is the variable we expose to the user-Agent
     	var numberOfFingers = 4;
     	
     	function createFingerJoints() {
-		// Get the rectangle and replace it with paths 
+			// Get the rectangle and replace it with paths 
 
-		var rectangle = document.getElementById('baseRect');
-		var newRect = [rectangle.getAttribute('x'), rectangle.getAttribute('y'), rectangle.getAttribute('width'), rectangle.getAttribute('height')];
+			var rectangle = document.getElementById('baseRect');
+			var newRect = [rectangle.getAttribute('x'), rectangle.getAttribute('y'), rectangle.getAttribute('width'), rectangle.getAttribute('height')];
 
-		//alert(newRect);
+			var newPath = document.createElementNS(document.rootElement.namespaceURI,"path");  
+			newPath.setAttribute("id", rectangle.getAttribute('id') + '-laser');  
+			newPath.setAttribute("stroke", "#384C6C");  
+			newPath.setAttribute("stroke-width", 2);  
+			newPath.setAttribute("opacity", 1);  
+			newPath.setAttribute("fill", "none");
 
-		var newPath = document.createElementNS(document.rootElement.namespaceURI,"path");  
-		newPath.setAttribute("id", rectangle.getAttribute('id') + '-laser');  
-		newPath.setAttribute("stroke", "red");  
-		newPath.setAttribute("stroke-width", 2);  
-		newPath.setAttribute("opacity", 1);  
-		newPath.setAttribute("fill", "none");
+			// Now the interesting part
 
-		// Now the interesting part
-		//newPath.setAttribute("d", "M 1,97.857143 C 19.285714,96.428571 24.016862,131.64801 90.714286,132.85714 140.78762,133.7649 202.79376,66.16041 202.79376,66.16041");  
-		// Move to the origin of the rectangle.
-		var pathDescription = "M " + newRect[0] + "," + newRect[1] + " ";
+			// Move to the origin of the rectangle.
+			var pathDescription = "M " + newRect[0] + "," + newRect[1] + " ";
 
-		
+			// A safe space at the end of the path. Basically the distance from the edge to the first finger.
+			var safeSpaceAtEdge = 10;
 
-		// A safe space at the end of the path. Basically the distance from the edge to the first finger.
-		var safeSpaceAtEdge = 10;
+			pathDescription += createFingerPath(newRect[2], 0, safeSpaceAtEdge, 5, numberOfFingers);
+			pathDescription += createFingerPath(0, newRect[3], safeSpaceAtEdge, -5, numberOfFingers);
+			pathDescription += createFingerPath(-newRect[2], 0, safeSpaceAtEdge, -5, numberOfFingers);
+			pathDescription += createFingerPath(0, -newRect[3], safeSpaceAtEdge, 5, numberOfFingers);
+			
+			newPath.setAttribute("d", pathDescription);
 
-		pathDescription += createFingerPath(newRect[2], 0, safeSpaceAtEdge, 5, numberOfFingers);
-		pathDescription += createFingerPath(0, newRect[3], safeSpaceAtEdge, -5, numberOfFingers);
-		pathDescription += createFingerPath(-newRect[2], 0, safeSpaceAtEdge, -5, numberOfFingers);
-		pathDescription += createFingerPath(0, -newRect[3], safeSpaceAtEdge, 5, numberOfFingers);
-		newPath.setAttribute("d", pathDescription);
-
-		var oldPath = document.getElementById(newPath.getAttribute("id"));
-		if (oldPath != null) {
-			document.rootElement.replaceChild(newPath, oldPath);
-		}
-		else {
-			document.rootElement.appendChild(newPath);
-		}
-		
+			var oldPath = document.getElementById(newPath.getAttribute("id"));
+			if (oldPath != null) {
+				document.rootElement.replaceChild(newPath, oldPath);
+			}
+			else {
+				document.rootElement.appendChild(newPath);
+			}
+			
 
 		}
 
