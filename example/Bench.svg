@@ -15,14 +15,15 @@
             l -150 0 l 0 -5 l -3 0 l 0 -5 l 3 0 l 0 -5 l -3 0 l 0 -5 l 3 0 z" laser:template="m {thickness} 0 
             l 150 0 l 0 5 l {thickness} 0 l 0 5 l -{thickness} 0 l 0 5 l {thickness} 0 l 0 5 l -{thickness} 0 l 0 5 
             l -150 0 l 0 -5 l -{thickness} 0 l 0 -5 l {thickness} 0 l 0 -5 l -{thickness} 0 l 0 -5 l {thickness} 0 z"
+            laser:press-fit-mask="m m i m i m i m i m m m i m i m i m i m"
             stroke="#384C6C" stroke-width="0.5" fill="#E1E4E9" />
         <g id="benchSide" fill="#F5F6F8">
             <rect x="0" y="0" width="50" height="50" stroke="#384C6C" stroke-width="0.5" />
             <g fill="#E1E4E9" stroke="#A9CE38" stroke-width="0.2">
-                <rect x="15" y="30" width="5" height="3" laser:material-thickness="height" laser:press-fit="middle" />
-                <rect x="25" y="30" width="5" height="3" laser:material-thickness="height" laser:press-fit="middle" />
-                <rect x="40" y="5" width="3" height="5"  laser:material-thickness="width" laser:press-fit="middle" />
-                <rect x="40" y="15" width="3" height="5" laser:material-thickness="width" laser:press-fit="middle" />
+                <rect x="15" y="30" width="5" height="3" laser:material-thickness="height" laser:press-fit="outside" />
+                <rect x="25" y="30" width="5" height="3" laser:material-thickness="height" laser:press-fit="outside" />
+                <rect x="40" y="5" width="3" height="5"  laser:material-thickness="width" laser:press-fit="outside" />
+                <rect x="40" y="15" width="3" height="5" laser:material-thickness="width" laser:press-fit="outside" />
             </g>
         </g>    
     </defs>
