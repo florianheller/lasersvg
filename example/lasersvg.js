@@ -20,6 +20,8 @@
 
 var laser_NS = 'http://www.heller-web.net/lasersvg';
 
+var laserSvgScript;
+
 function updateThickness(materialThickness) {
 	// Show the materialThickness 
 	var factorDisplay = document.getElementById('materialThickness');
@@ -74,9 +76,33 @@ function updateScaling(scalingFactor) {
 }
 
 
+
+
+// Callback to redraw after variables have been changed from the outside
+function updateDrawing(numberOfFingers) {
+	var fingerDisplay = document.getElementById('numberOfFingers');
+ 	fingerDisplay.innerHTML = numberOfFingers
+
+	laserSvgScript.numberOfFingers = numberOfFingers;
+	laserSvgScript.createFingerJoints();
+}
+
+// This function gets called by the JavaScript embedded into the SVG file. 
+// Setting the variable allows us to access the embedded JS to update parameters.
+function svgLoaded(script){
+	laserSvgScript = script;
+}
+
+
+// Callbacks for the sliders
 document.getElementById("scalingSlider").onchange = function() {
 	updateScaling(this.value); 
 	}
 document.getElementById("materialSlider").onchange = function() {
 	updateThickness(this.value); 
 	}
+
+document.getElementById("fingerSlider").onchange = function() {
+	updateDrawing(this.value); 
+	}
+
