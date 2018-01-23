@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?xml-stylesheet type="text/css" href="style.css"?>
-<svg width="500mm" height="500mm" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:laser="http://www.heller-web.net/lasersvg" onload="svgLoaded(evt)">
+<svg width="250mm" height="250mm" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:laser="http://www.heller-web.net/lasersvg" onload="svgLoaded(evt)">
 <script type="text/javascript" xlink:href="path-data-polyfill.js" />
 <script type="text/javascript" xlink:href="lasersvg.js" />
 			<rect x="0" y="55" width="50" height="50" laser:joint-right="1" laser:joint-right-direction="outside" laser:joint-right-type="finger"/>

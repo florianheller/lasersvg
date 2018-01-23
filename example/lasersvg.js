@@ -20,11 +20,11 @@
 
 var laser_NS = 'http://www.heller-web.net/lasersvg';
 
-var laserSvgScript;
 var laserSvgDocument;
 var laserSvgRoot;
 
 var materialThickness = 4.0;
+var numberOfFingers = 5;
 
 function updateThickness(materialThickness) {
 	// Show the materialThickness 
@@ -151,7 +151,7 @@ function createJoints() {
 			}
 		}
 		//create a new path with the joint pattern
-		createFingerPath(path, 5, materialThickness * direction, 6);
+		createFingerPath(path, 5, materialThickness * direction, numberOfFingers);
 	}
 }
 
@@ -228,9 +228,9 @@ function transferAttributes(rect, path, orientation) {
 function updateDrawing(numberOfFingers) {
 	var fingerDisplay = document.getElementById('numberOfFingers');
  	fingerDisplay.innerHTML = numberOfFingers
-
+ 	console.log(numberOfFingers);
 	laserSvgScript.numberOfFingers = numberOfFingers;
-	laserSvgScript.createFingerJoints();
+	laserSvgScript.createJoints();
 
 }
 
@@ -240,7 +240,9 @@ function updateDrawing(numberOfFingers) {
 // This function gets called by the JavaScript embedded into the SVG file. 
 // Setting the variable allows us to access the embedded JS to update parameters.
 function svgLoaded(event){
-	laserSvgScript = event;	// A pointer to this very script in order to allow an embedding document to call functions on this script
+	// If the embedding document supports it, make our functions available
+	if(window.parent.svgLoaded) window.parent.svgLoaded(this);
+	//laserSvgScript = event;	// A pointer to this very script in order to allow an embedding document to call functions on this script
 	laserSvgDocument = event.target.ownerDocument;	// A pointer to our own SVG document, to make sure we have the correct pointer even if we are embedded in another document
 	laserSvgRoot = laserSvgDocument.documentElement;	// The DOM-Root of our svg document.
 		// TODO: remove groups by applying their transforms to the child elements.
@@ -251,29 +253,12 @@ function svgLoaded(event){
 		createJoints();
 
 		// TODO: draw the lines visualizing the connections.
-
 }
 
-// This function exports the SVG with all changes as a new file
-// See https://stackoverflow.com/questions/23218174/how-do-i-save-export-an-svg-file-after-creating-an-svg-with-d3-js-ie-safari-an
-function exportSVG() {
-	var serializer = new XMLSerializer();
-	var source = serializer.serialzeToString(laserSvgRoot);
-	console.log(source);
+function getImageForExport() {
+	// TODO: remove the lines vizualizing the connections
+	// TODO: remove the interactivity (onMouseOver etc.)
+
+	let serializer = new XMLSerializer();
+	return serializer.serializeToString(laserSvgRoot);
 }
-
-
-// Callbacks for the sliders
-/*
-document.getElementById("scalingSlider").onchange = function() {
-	updateScaling(this.value); 
-	}
-document.getElementById("materialSlider").onchange = function() {
-	updateThickness(this.value); 
-	}
-
-document.getElementById("fingerSlider").onchange = function() {
-	updateDrawing(this.value); 
-	}
-
-*/
