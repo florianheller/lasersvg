@@ -20,15 +20,13 @@
 
 var laser_NS = 'http://www.heller-web.net/lasersvg';
 
-<<<<<<< HEAD
-var laserSvgScript;
-=======
+
 var laserSvgDocument;
 var laserSvgRoot;
 
 var materialThickness = 4.0;
 var numberOfFingers = 5;
->>>>>>> 3d04ae9... Split into client and host scripts
+
 
 function updateThickness(materialThickness) {
 	// Show the materialThickness 
@@ -85,8 +83,6 @@ function updateScaling(scalingFactor) {
 
 
 
-<<<<<<< HEAD
-=======
 // @param path: the path to replace. Only the connection between the first two points is considered.
 // @param gap:  the gap between the origin of the path and the first finger
 // @param inset: the height of the fingers
@@ -229,7 +225,7 @@ function transferAttributes(rect, path, orientation) {
 	}
 
 }
->>>>>>> 3d04ae9... Split into client and host scripts
+
 
 // Callback to redraw after variables have been changed from the outside
 function updateDrawing(numberOfFingers) {
@@ -237,35 +233,15 @@ function updateDrawing(numberOfFingers) {
  	fingerDisplay.innerHTML = numberOfFingers
  	console.log(numberOfFingers);
 	laserSvgScript.numberOfFingers = numberOfFingers;
-<<<<<<< HEAD
-	laserSvgScript.createFingerJoints();
-=======
-	laserSvgScript.createJoints();
 
->>>>>>> 3d04ae9... Split into client and host scripts
+	laserSvgScript.createJoints();
 }
+
+
+
 
 // This function gets called by the JavaScript embedded into the SVG file. 
 // Setting the variable allows us to access the embedded JS to update parameters.
-<<<<<<< HEAD
-function svgLoaded(script){
-	laserSvgScript = script;
-}
-
-
-// Callbacks for the sliders
-document.getElementById("scalingSlider").onchange = function() {
-	updateScaling(this.value); 
-	}
-document.getElementById("materialSlider").onchange = function() {
-	updateThickness(this.value); 
-	}
-
-document.getElementById("fingerSlider").onchange = function() {
-	updateDrawing(this.value); 
-	}
-
-=======
 function svgLoaded(event){
 	// If the embedding document supports it, make our functions available
 	if(window.parent.svgLoaded) window.parent.svgLoaded(this);
@@ -278,7 +254,6 @@ function svgLoaded(event){
 		replacePrimitives();
 		// Create the joints as specified by the parameters
 		createJoints();
-
 		// TODO: draw the lines visualizing the connections.
 }
 
@@ -289,4 +264,3 @@ function getImageForExport() {
 	let serializer = new XMLSerializer();
 	return serializer.serializeToString(laserSvgRoot);
 }
->>>>>>> 3d04ae9... Split into client and host scripts
