@@ -1,0 +1,23 @@
+@namespace laser 'http://www.heller-web.net/lasersvg';
+@namespace xlink 'http://www.w3.org/1999/xlink';
+
+svg {
+	background-color: #F5F6F8;
+	padding:50px;
+}
+
+path {
+	stroke: #384C6C;
+	stroke-linecap: square;
+	fill: none;
+}
+
+
+
+[laser|joint] {
+	stroke: #A9CE38;
+	//stroke-dasharray: 5,10,5;
+	//fill: none;
+}
+
+
