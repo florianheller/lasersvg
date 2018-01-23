@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml-stylesheet type="text/css" href="style.css"?>
+<svg width="500mm" height="500mm" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:laser="http://www.heller-web.net/lasersvg" onload="svgLoaded(evt)">
+<script type="text/javascript" xlink:href="path-data-polyfill.js" />
+<script type="text/javascript" xlink:href="lasersvg.js" />
+			<rect x="0" y="55" width="50" height="50" laser:joint-right="1" laser:joint-right-direction="outside" laser:joint-right-type="finger"/>
+			<rect x="55" y="0" width="50" height="50" laser:joint-bottom="2" laser:joint-bottom-direction="outside" laser:joint-bottom-type="finger"/>
+			<rect x="55" y="55" width="50" height="50" laser:thickness="3"
+				laser:joint-left="1" laser:joint-left-direction="inside" laser:joint-left-type="finger" 
+				laser:joint-top="2" laser:joint-top-direction="inside" laser:joint-top-type="finger"
+				laser:joint-right="3" laser:joint-right-direction="inside" laser:joint-right-type="finger"
+				laser:joint-bottom="4" laser:joint-bottom-direction="inside" laser:joint-bottom-type="finger" />
+			<rect x="110" y="55" width="50" height="50" />
+			<rect x="55" y="110" width="50" height="50" />
+			<rect x="55" y="165" width="50" height="50" />
+</svg>
