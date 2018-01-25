@@ -93,7 +93,7 @@ function updateDrawing(numberOfFingers) {
 }
 
 
-function svgLoaded(script) {
+function svgDidLoad(script) {
 	laserSvgScript = script;
 }
 

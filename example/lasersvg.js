@@ -244,7 +244,7 @@ function updateDrawing(numberOfFingers) {
 // Setting the variable allows us to access the embedded JS to update parameters.
 function svgLoaded(event){
 	// If the embedding document supports it, make our functions available
-	if(window.parent.svgLoaded) window.parent.svgLoaded(this);
+	if(window.parent.svgDidLoad) window.parent.svgDidLoad(this);
 	//laserSvgScript = event;	// A pointer to this very script in order to allow an embedding document to call functions on this script
 	laserSvgDocument = event.target.ownerDocument;	// A pointer to our own SVG document, to make sure we have the correct pointer even if we are embedded in another document
 	laserSvgRoot = laserSvgDocument.documentElement;	// The DOM-Root of our svg document.
