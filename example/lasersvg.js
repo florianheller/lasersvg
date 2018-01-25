@@ -121,9 +121,9 @@ function createFingerPath(path, gap, inset, fingers) {
  	
 	//We are now at the point to add the first finger
 	for (var i = 0; i < fingers; i += 1) {
- 		newPathData.push({type: "l", values: [(sin * inset), (cos * inset)]});
+ 		newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * inset), (Math.sin(alpha+(Math.PI/2)) * inset)]});
  		newPathData.push({type: "l", values: [(cos * fingerSize), (sin * fingerSize)]});
- 		newPathData.push({type: "l", values: [(-sin * inset), (-cos * inset)]});
+ 		newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * inset), (Math.sin(alpha-(Math.PI/2)) * inset)]});
 
 		if (i != fingers-1) {
 			newPathData.push({type: "l", values: [cos * fingerSize, sin * fingerSize]});
