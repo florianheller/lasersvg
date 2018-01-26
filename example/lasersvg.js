@@ -90,7 +90,7 @@ function updateScaling(scalingFactor) {
 
 // Right now either width or height needs to be zero, i.e., only works for horizontal and vertical lines
 
-function createFingerPath(path, gap, inset, fingers) {
+function createFingerJointPath(path, gap, inset, fingers) {
 	var pathData = path.getPathData({normalize: true});
 
 	if (pathData.length < 2) {
@@ -138,6 +138,66 @@ function createFingerPath(path, gap, inset, fingers) {
 }
 
 
+function createFlapJointPath(path, gap, inset, flaps) {
+	var pathData = path.getPathData({normalize: true});
+
+	if (pathData.length < 2) {
+		return;
+	}
+
+	// There's no inside for a flap
+	if (inset < 0) { inset = -inset; }
+	
+
+	// Working with pathData.length allows us to replace entire paths that, e.g., already contain a finger-joint pattern.
+	let width = pathData[pathData.length-1].values[0] - pathData[0].values[0];
+	let height = pathData[pathData.length-1].values[1] - pathData[0].values[1];
+	let alpha = Math.atan2(height, width);
+	let cos = Math.cos(alpha);
+	let sin = Math.sin(alpha);
+
+	// Calculate the length of the fingers and gaps
+	var edgeLength = Math.sqrt(height * height + width * width);
+
+	// Subtract the gaps on each side
+	edgeLength -=  2 * gap; 
+
+	//This length has to be divided into /fingers/ fingers and fingers-1 gaps
+	let fingerSize = edgeLength / (flaps);
+
+	//The first element of the first path segment list, as this determines the origin
+	// 
+	var newPathData = []; 
+	newPathData.push(pathData[0]);
+ 	
+ 	newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
+ 	
+	//We are now at the point to add the first finger
+	for (var i = 0; i < flaps; i += 1) {
+		//newPathData.push({type: "l", values: [inset, inset]});
+		let stepX = (cos * inset) + (Math.cos(alpha+(Math.PI/2)) * inset);
+		let stepY = (sin * inset) + (Math.sin(alpha+(Math.PI/2)) * inset);
+
+		let stepX2 = (cos * inset) + (Math.cos(alpha-(Math.PI/2)) * inset);
+		let stepY2 = (sin * inset) + (Math.sin(alpha-(Math.PI/2)) * inset);
+
+ 		newPathData.push({type: "l", values: [stepX, stepY]});
+ 		newPathData.push({type: "l", values: [(cos * (fingerSize-2*inset)) , (sin * (fingerSize - 2*inset))]});
+ 		//newPathData.push({type: "l", values: [inset, -inset]});
+ 		newPathData.push({type: "l", values: [stepX2, stepY2]});
+
+		//if (i != flaps-1) {
+		//	newPathData.push({type: "l", values: [cos * fingerSize, sin * fingerSize]});
+		//}
+	}
+
+	// Close the second gap
+	newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
+
+	path.setPathData(newPathData);
+	
+}
+
 function createJoints() {
 	// TODO: replace all rects by 4 equivalent paths
 	// TODO: replace composed paths by equivalent 1-stop paths
@@ -153,7 +213,16 @@ function createJoints() {
 			}
 		}
 		//create a new path with the joint pattern
-		createFingerPath(path, 5, materialThickness * direction, numberOfFingers);
+		if (path.hasAttributeNS(laser_NS,'joint-type')) {
+			switch(path.getAttributeNS(laser_NS,'joint-type')) {
+				case 'finger': createFingerJointPath(path, 5, materialThickness * direction, numberOfFingers); break;
+				case 'flap': createFlapJointPath(path, 5, materialThickness, 2); break;
+
+				default: break;
+			}
+		}
+		//createFingerJointPath(path, 5, materialThickness * direction, numberOfFingers);
+		//createFlapJointPath(path, 5, materialThickness, 1);
 	}
 }
 
