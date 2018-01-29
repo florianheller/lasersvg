@@ -198,6 +198,121 @@ function createFlapJointPath(path, gap, inset, flaps) {
 	
 }
 
+function createTSlotPath(path, gap, inset, fingers) {
+	var pathData = path.getPathData({normalize: true});
+
+	if (pathData.length < 2) {
+		return;
+	}
+	// Working with pathData.length allows us to replace entire paths that, e.g., already contain a finger-joint pattern.
+	let width = pathData[pathData.length-1].values[0] - pathData[0].values[0];
+	let height = pathData[pathData.length-1].values[1] - pathData[0].values[1];
+	let alpha = Math.atan2(height, width);
+	let cos = Math.cos(alpha);
+	let sin = Math.sin(alpha);
+
+	// Calculate the length of the fingers and gaps
+	var edgeLength = Math.sqrt(height * height + width * width);
+
+	// Subtract the gaps on each side
+	edgeLength -=  2 * gap; 
+
+	//This length has to be divided into /fingers/ fingers and fingers-1 gaps
+	let fingerSize = edgeLength / (2 * fingers - 1);
+
+	
+	if (inset < 0) {
+
+		//The first element of the first path segment list, as this determines the origin
+		// 
+		var newPathData = []; 
+		newPathData.push(pathData[0]);
+	 	
+	 	newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
+	 	
+	 	//We are now at the point to add the first finger
+		for (var i = 0; i < fingers; i += 1) {
+
+			// Check wether we need to make the t-slots or holes for the screws depending on the direction
+			if (i%2 != 0) {
+			 	newPathData.push({type: "l", values: [(cos * (fingerSize-2)/2), (sin * (fingerSize-2)/2)]});
+
+				newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * -inset/2), (Math.sin(alpha+(Math.PI/2)) * -inset/2)]});
+		 		newPathData.push({type: "l", values: [(cos * -2), (sin * -2)]}); //Todo: nut size
+		 		newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * 2), (Math.sin(alpha+(Math.PI/2)) * 2)]});
+		 		newPathData.push({type: "l", values: [(cos * 2), (sin * 2)]}); //Todo: nut size
+		 		newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * -inset/2), (Math.sin(alpha+(Math.PI/2)) * -inset/2)]});
+		 		newPathData.push({type: "l", values: [(cos * 2), (sin * 2)]}); //Todo: bolt diameter
+		 		newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * -inset/2), (Math.sin(alpha-(Math.PI/2)) * -inset/2)]});
+		 		newPathData.push({type: "l", values: [(cos * 2), (sin * 2)]}); //Todo: nut size
+		 		newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * 2), (Math.sin(alpha-(Math.PI/2)) * 2)]});
+				newPathData.push({type: "l", values: [(cos * -2), (sin * -2)]}); //Todo: nut size
+		 		newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * -inset/2), (Math.sin(alpha-(Math.PI/2)) * -inset/2)]});
+				newPathData.push({type: "l", values: [(cos * (fingerSize-2)/2), (sin * (fingerSize-2)/2)]});
+		 		//newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * -inset/2), (Math.sin(alpha-(Math.PI/2)) * -inset/2)]});
+		 		if (i != fingers-1) {
+					newPathData.push({type: "l", values: [cos * fingerSize, sin * fingerSize]});
+				}
+
+			}
+			else {
+		 		newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * inset), (Math.sin(alpha+(Math.PI/2)) * inset)]});
+		 		newPathData.push({type: "l", values: [(cos * fingerSize), (sin * fingerSize)]});
+		 		newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * inset), (Math.sin(alpha-(Math.PI/2)) * inset)]});
+
+				if (i != fingers-1) {
+					newPathData.push({type: "l", values: [cos * fingerSize, sin * fingerSize]});
+				}
+			}
+		}
+
+		// Close the second gap
+		newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
+
+		path.setPathData(newPathData);
+	
+	}
+	else {
+
+		var newPathData = []; 
+		newPathData.push(pathData[0]);
+	 	
+	 	newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
+
+		for (var i = 0; i < fingers; i += 1) {
+
+			if (i%2 == 0) {
+				newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * inset), (Math.sin(alpha+(Math.PI/2)) * inset)]});
+ 				newPathData.push({type: "l", values: [(cos * fingerSize), (sin * fingerSize)]});
+ 				newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * inset), (Math.sin(alpha-(Math.PI/2)) * inset)]});
+
+				if (i != fingers-1) {
+					newPathData.push({type: "l", values: [cos * 3 * fingerSize, sin * 3 * fingerSize]});
+				}
+			}
+
+			else {
+
+				//The circles take absolute coordinates, so ew have to calculate them
+					var x = pathData[0].values[0];
+					var y = pathData[0].values[1];
+
+				let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+				//circle.setAttribute("cx", x+(2*i *fingerSize)+gap+0.5*fingerSize+(Math.cos(alpha+(Math.PI/2)) * inset));
+				circle.setAttribute("cx", x + Math.cos(alpha) * ((2* i *fingerSize)+gap+0.5*fingerSize) + (Math.cos(alpha+(Math.PI/2)) * inset));
+				circle.setAttribute("cy", y + Math.sin(alpha) * ((2* i *fingerSize)+gap+0.5*fingerSize) + (Math.sin(alpha+(Math.PI/2)) * inset));
+				circle.setAttribute("r",  2);
+				laserSvgRoot.appendChild(circle);	
+
+			}
+		}
+		newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
+
+	}
+
+	path.setPathData(newPathData);
+}
+
 function createJoints() {
 	// TODO: replace all rects by 4 equivalent paths
 	// TODO: replace composed paths by equivalent 1-stop paths
@@ -217,7 +332,7 @@ function createJoints() {
 			switch(path.getAttributeNS(laser_NS,'joint-type')) {
 				case 'finger': createFingerJointPath(path, 5, materialThickness * direction, numberOfFingers); break;
 				case 'flap': createFlapJointPath(path, 5, materialThickness, 2); break;
-
+				case 'tslot': createTSlotPath(path, 5, materialThickness * direction, numberOfFingers); break;
 				default: break;
 			}
 		}
