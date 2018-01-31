@@ -29,34 +29,9 @@ function updateThickness(materialThickness) {
 	// Show the materialThickness 
 	var factorDisplay = document.getElementById('materialThickness');
   	factorDisplay.innerHTML = materialThickness;
-	//Scale the objects
 	
-	var drawingObject = document.getElementById('drawingObject');
-
-	// Iterate over all objects in the SVG
-	var svgDrawing = drawingObject.contentDocument;
-	var elements = svgDrawing.querySelectorAll('*');
-
-	for (var i=0; i<elements.length; i++) {
-		var element = elements[i];
-		// Check if it has a material thickness attribute
-		if (element.hasAttributeNS(laser_NS,'material-thickness')) {
-			var thickness = element.getAttributeNS(laser_NS,'material-thickness');
-			switch (thickness) {
-				case 'width': element.setAttribute("width", materialThickness); break; 
-				case 'height': element.setAttribute("height", materialThickness); break; 
-				case 'both': element.setAttribute("height", materialThickness); element.setAttribute("width", materialThickness); break;
-				default: break; // Results to none
-			}
-		}
-		// Check if the element has a template attribute
-		if (element.hasAttributeNS(laser_NS,'template')) {
-			// If so, use the template to resize the path correctly
-			var template = element.getAttributeNS(laser_NS,'template');
-			var newTemplate = template.replace(/[{]thickness[}]/g,materialThickness);
-			element.setAttribute("d",newTemplate);
-		}
-	}
+	//Scale the objects
+	laserSvgScript.updateThickness(materialThickness);
 }
 
 

@@ -28,17 +28,12 @@ var materialThickness = 4.0;
 var numberOfFingers = 5;
 
 
-function updateThickness(materialThickness) {
-	// Show the materialThickness 
-	var factorDisplay = document.getElementById('materialThickness');
-  	factorDisplay.innerHTML = materialThickness;
-	//Scale the objects
-	
-	var drawingObject = document.getElementById('drawingObject');
+function updateThickness(newThickness) {
+
+	materialThickness = Number(newThickness);
 
 	// Iterate over all objects in the SVG
-	var svgDrawing = drawingObject.contentDocument;
-	var elements = svgDrawing.querySelectorAll('*');
+	var elements = laserSvgRoot.querySelectorAll('*');
 
 	for (var i=0; i<elements.length; i++) {
 		var element = elements[i];
