@@ -65,17 +65,8 @@ function updateScaling(scalingFactor) {
 	var factorDisplay = document.getElementById('scalingFactor');
  	factorDisplay.innerHTML = scalingFactor
 
-	//Scale the object
-	var drawingObject = document.getElementById('drawingObject');
-	var svgDrawing = drawingObject.contentDocument;
-	
-	//TODO: this is not functional as of now.
-	var elements = svgDrawing.querySelectorAll('use');
-	for (var i=0; i<elements.length; i++) {
-		var element = elements[i];
-		var attribute = "scale(" + scalingFactor + ")";
-		element.setAttribute("transform", attribute);
-	}
+	//Scale the object drawing
+	laserSvgScript.updateScaling(scalingFactor);
 }
 
 
