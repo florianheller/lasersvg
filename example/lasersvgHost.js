@@ -115,13 +115,20 @@ function exportSVG() {
 
 // Callbacks for the sliders
 
-document.getElementById("scalingSlider").onchange = function() {
-	updateScaling(this.value); 
+if (slider = document.getElementById("scalingSlider"))
+	slider.onchange = function() {
+	updateScaling(this.value);  
 	}
-document.getElementById("materialSlider").onchange = function() {
+
+if (slider = document.getElementById("materialSlider"))
+	slider.onchange = function() {
 	updateThickness(this.value); 
 	}
-document.getElementById("fingerSlider").onchange = function() {
+
+if (slider = document.getElementById("fingerSlider")) {
+	slider.onchange = function() {
 	updateDrawing(this.value); 
 	}
+
+} 
 
