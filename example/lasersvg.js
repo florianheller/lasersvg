@@ -16,6 +16,9 @@
  *	laser:press-fit should work like the stroke-alignment attribute from SVG2
  *	laser:press-fit="middle | inside | outside" with middle being the default. The other options offset the 
  *	path by _cutWidth_ to make the resulting piece having the exact dimensions as defined by the drawing. 
+ *
+ *	TODO: replace use-links to defs in the DOM
+ *	TODO: ungroup groups in the working DOM
  */
 
 var laser_NS = 'http://www.heller-web.net/lasersvg';
@@ -64,20 +67,48 @@ function updateThickness(newThickness) {
 
 
 function updateScaling(scalingFactor) {
-	// Show the scaling factor
-	var factorDisplay = document.getElementById('scalingFactor');
- 	factorDisplay.innerHTML = scalingFactor
 
-	//Scale the object
-	var drawingObject = document.getElementById('drawingObject');
-	var svgDrawing = drawingObject.contentDocument;
-	
-	//TODO: this is not functional as of now.
-	var elements = svgDrawing.querySelectorAll('use');
-	for (var i=0; i<elements.length; i++) {
-		var element = elements[i];
-		var attribute = "scale(" + scalingFactor + ")";
-		element.setAttribute("transform", attribute);
+	//iterate over all objects and scale them accordingly
+	//var elements = laserSvgRoot.querySelectorAll('*');
+	//
+
+	var elements = laserSvgRoot.getElementsByTagName('path');
+	for (var i=0; i < elements.length; i++) {
+		element = elements[i];
+		if (element.hasAttribute("x")) {
+			element.setAttribute(Number(element.getAttribute("x"))*scalingFactor);
+		}
+		if (element.hasAttribute("y")) {
+			element.setAttribute(Number(element.getAttribute("y"))*scalingFactor);
+		}
+		if (element.hasAttribute("width")) {
+			element.setAttribute(Number(element.getAttribute("width"))*scalingFactor);
+		}
+		if (element.hasAttribute("height")) {
+			element.setAttribute(Number(element.getAttribute("height"))*scalingFactor);
+		}
+		if (element.hasAttributeNS(laser_NS,'template')) {
+			var template = element.getAttributeNS(laser_NS,'template');
+			var thickness = Number(materialThickness) / scalingFactor;
+			var newTemplate = template.replace(/[{](.*?thickness.*?)[}]/g, function (x) { return eval(x); });
+			console.log(newTemplate);
+			element.setAttribute("d",newTemplate);
+
+		}
+		if (element.hasAttribute("d")) {
+			var pathData = element.getPathData({normalize: false});
+			var newPathData = [];
+			//for (let segment in element.getPathData({normalize: true})) {
+			for (var j = 0; j<pathData.length; j++) {
+				segment = pathData[j];
+				console.log(segment);
+				segment.values[0] *= scalingFactor;
+				segment.values[1] *= scalingFactor;
+				newPathData.push(segment);
+			}
+			element.setPathData(newPathData);
+		}
+
 	}
 }
 
@@ -303,6 +334,7 @@ function createTSlotPath(path, gap, inset, fingers) {
 				circle.setAttribute("cy", y + Math.sin(alpha) * ((2* i *fingerSize)+gap+0.5*fingerSize) + (Math.sin(alpha+(Math.PI/2)) * inset));
 				circle.setAttribute("r",  2);
 				laserSvgRoot.appendChild(circle);	
+				//TODO: how do we remove the stuff? Maybe use arcs in the path instead of circles
 
 			}
 		}
