@@ -394,7 +394,7 @@ function replacePrimitives() {
 		laserSvgRoot.appendChild(pathLeft);
 
 		// Remove the original rect
-		laserSvgRoot.removeChild(rect);
+		rect.parentNode.removeChild(rect);
 	}
 }
 
