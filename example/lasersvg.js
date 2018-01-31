@@ -51,7 +51,12 @@ function updateThickness(newThickness) {
 		if (element.hasAttributeNS(laser_NS,'template')) {
 			// If so, use the template to resize the path correctly
 			var template = element.getAttributeNS(laser_NS,'template');
-			var newTemplate = template.replace(/[{]thickness[}]/g,materialThickness);
+			var thickness = Number(materialThickness);
+			if (element.hasAttributeNS(laser_NS,'thickness')) {
+				thickness = element.getAttributeNS(laser_NS,'thickness');
+			}
+			var newTemplate = template.replace(/[{](.*?thickness.*?)[}]/g, function (x) { return eval(x); });
+			console.log(newTemplate);
 			element.setAttribute("d",newTemplate);
 		}
 	}
