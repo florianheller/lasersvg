@@ -1,23 +1,87 @@
-@namespace laser 'http://www.heller-web.net/lasersvg';
-@namespace xlink 'http://www.w3.org/1999/xlink';
-
-svg {
-	background-color: #F5F6F8;
-	padding:50px;
+html {
+	height: 100%;
 }
 
-path {
+body {
+	font-family: Arial, sans-serif;
+	background: linear-gradient(#F5F6F8, #E1E4E9);
+	background-size: 100%;
+}
+
+#fileHandling {
+	width: 300px;
+	height: 20px;	
+	border: 1px solid #A9CE38;
+	padding: 5px;
+	position: fixed;
+	top: 80px;
+	right: 10px;
+}
+
+#controlPanels{
+	position: fixed;
+	top: 110px;
+	right: 10px;
+	font-size: 75%;
+}
+#controlPanels>div {
+	width: 300px;
+	border: 1px solid #A9CE38;
+	padding: 5px;
+}
+
+
+#materialSlider {
+	width: 150px;
+}
+
+div label, div input{
+    vertical-align: middle;
+    padding:0px;
+    margin:0px;
+}
+
+#drawingObject {
+	width: 100%;
+  	height: 600px;
+}
+
+
+.hidden {
+	visibility: hidden;
+}
+
+
+#svg-container svg {
+	border: 1px solid black;
+}
+
+#inner {
+	fill:#A9CE38;
 	stroke: #384C6C;
-	stroke-linecap: square;
+}
+
+#pathTemplate {
+	width: 100%;
+	height: 150px;
+	font-size: 85%;
+	font-family: Courier;
+	background: #F5F6F8;
+	border: 1px solid #384C6C;
+}
+
+#pathTemplateSave {
+	position: relative;
+	right: 0px;
+}
+
+circ:nth-child(2n+1) {
+	stroke-width:7px;
+}
+#triangle {
 	fill: none;
+	stroke: #384C6C;
 }
-
-
-
-[laser|joint] {
-	stroke: #A9CE38;
-	//stroke-dasharray: 5,10,5;
-	//fill: none;
+path:nth-child(n+1) {
+	stroke-width:7px;
 }
-
-

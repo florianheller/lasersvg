@@ -5,23 +5,69 @@
     <meta author="Florian Heller">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="lasersvg.css" rel="stylesheet" type="text/css">
+    <link href="style.css" rel="stylesheet" type="text/css">
     <title>LaserSVG</title>
   </head>
   <body>
     <h1>LaserSVG Demo</h1>
-    <h2>Changing material thickness</h2>
-    <p style="border-width: 1px; border-color: #000000; border-style: solid; padding: 25px;">
+    <div id="fileHandling">
+      <button id="loadButton">Open File</button> 
+      <button id="saveButton" onclick="exportSVG()">Save File</button>
+    </div>
+    <p style="border: 1px solid #384C6C; padding: 15px;">
         <object id="drawingObject" data="Bench.svg" type="image/svg+xml" ></object>
     </p>
-    <div id="controls">
-      Image scale:
-      <input type="range" min="0.5" max="5" step="0.5" value="1" class="slider" id="scalingSlider">
-      <span id="scalingFactor">1</span>
-      <br>
-      Material Thickness:
-      <input type="range" min="0.5" max="10" step="0.5" value="3.5" class="slider" id="materialSlider">
-      <span id="materialThickness">3.5</span> mm
+    <div id="controlPanels">
+      <div id="controls">
+        <h3>Global Settings </h3>
+        Zoom: <span id="scalingFactor">1</span> 
+        <button type="button" id="zoomOut">-</button>  <button type="button" id="zoomIn">+</button> 
+        <br>
+        <div> <label for="materialSlider">Material Thickness:</label>
+        <input type="range" min="0.5" max="10" step="0.5" value="3.5" class="slider" id="materialSlider">
+        <span id="materialThickness">3.5</span> mm
+      </div>
+      </div>
+      <div id="parameters">
+        <h3>Parameters</h3>
+        
+          <div id="pathThickness">
+            <p>Material Thickness: 
+            <div id="pathTemplate" title="Replace the dimensions that are dependent on material thickness with {thickness}. Calculations such as {0.5*thickness} are possible." contenteditable></div>
+            <button type="button" id="pathTemplateSave" onclick="savePathTemplate()">Apply</button>
+            </p>
+          </div>
+          <div id="primitiveThickness">Thickness adjustment:
+            <select id="thicknessSelection" onchange="setThicknessAdjustment()">
+            <option value="none"></option>
+            <option value="width">Width</option>
+            <option value="height">Height</option>
+            <option value="both">Width & Height</option>
+          </select>
+          </div>
+        <p>Kerf adjustment:  
+          <select id="kerfSelection" onchange="setKerfAdjustment()">
+            <option value="none"></option>
+            <option value="inside">Inside</option>
+            <option value="outside">Outside</option>
+          </select>
+        </p>
+        <p>Joint Type
+          <select id="jointTypeSelection" onchange="setJointType()">
+            <option value="none"></option>
+            <option value="flap">Flap</option>
+            <option value="finger">Finger</option>
+            <option value="tslot">T-Joint</option>
+          </select>
+        </p>
+        <p>Joint direction:
+          <select id="jointDirectionSelection" onchange="setJointDirection()">
+            <option value="none"></option>
+            <option value="inside">Inside</option>
+            <option value="outside">Outside</option>
+          </select>
+        </p>
+      </div>
     </div>
     <script type="text/javascript" src="lasersvgHost.js"></script>
   </body>

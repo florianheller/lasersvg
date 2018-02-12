@@ -7,36 +7,32 @@
     http://github.com/florianheller/lasersvg
     http://www.heller-web.net/lasersvg
 -->
-<svg width="100%" height="100%" viewBox="0 0 260 52" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:laser="http://www.heller-web.net/lasersvg" id="drawing">
-
-    <defs>
-        <path id="benchPlank" d="m 3 0 
+<?xml-stylesheet type="text/css" href="lasersvg.css"?>
+<svg width="200mm" height="100mm" version="1.1" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:laser="http://www.heller-web.net/lasersvg" onload="svgLoaded(evt)" laser:material-thickness="3">
+<script type="text/javascript" xlink:href="lasersvg.js" />
+<script type="text/javascript" xlink:href="path-data-polyfill.js" />
+	<path id="benchPlank" d="m 55 0 
             l 150 0 l 0 5 l 3 0 l 0 5 l -3 0 l 0 5 l 3 0 l 0 5 l -3 0 l 0 5 
-            l -150 0 l 0 -5 l -3 0 l 0 -5 l 3 0 l 0 -5 l -3 0 l 0 -5 l 3 0 z" laser:template="m {thickness} 0 
+            l -150 0 l 0 -5 l -3 0 l 0 -5 l 3 0 l 0 -5 l -3 0 l 0 -5 l 3 0 z" laser:template="m 55 0 
             l 150 0 l 0 5 l {thickness} 0 l 0 5 l -{thickness} 0 l 0 5 l {thickness} 0 l 0 5 l -{thickness} 0 l 0 5 
             l -150 0 l 0 -5 l -{thickness} 0 l 0 -5 l {thickness} 0 l 0 -5 l -{thickness} 0 l 0 -5 l {thickness} 0 z"
             laser:press-fit-mask="m m i m i m i m i m m m i m i m i m i m"
             stroke="#384C6C" stroke-width="0.5" fill="#E1E4E9" />
-        <g id="benchSide" fill="#F5F6F8">
-            <rect x="0" y="0" width="50" height="50" stroke="#384C6C" stroke-width="0.5" />
+    <path id="benchPlank2" d="m 55 25 
+            l 150 0 l 0 5 l 3 0 l 0 5 l -3 0 l 0 5 l 3 0 l 0 5 l -3 0 l 0 5 
+            l -150 0 l 0 -5 l -3 0 l 0 -5 l 3 0 l 0 -5 l -3 0 l 0 -5 l 3 0 z" laser:template="m 55 25 
+            l 150 0 l 0 5 l {thickness} 0 l 0 5 l -{thickness} 0 l 0 5 l {thickness} 0 l 0 5 l -{thickness} 0 l 0 5 
+            l -150 0 l 0 -5 l -{thickness} 0 l 0 -5 l {thickness} 0 l 0 -5 l -{thickness} 0 l 0 -5 l {thickness} 0 z"
+            laser:press-fit-mask="m m i m i m i m i m m m i m i m i m i m"
+            stroke="#384C6C" stroke-width="0.5" fill="#E1E4E9" />
+     <g id="benchSide" fill="#F5F6F8">
+            <rect x="0" y="0" width="50" height="50"/>
             <g fill="#E1E4E9" stroke="#A9CE38" stroke-width="0.2">
-                <rect x="15" y="30" width="5" height="3" laser:material-thickness="height" laser:press-fit="outside" />
-                <rect x="25" y="30" width="5" height="3" laser:material-thickness="height" laser:press-fit="outside" />
-                <rect x="40" y="5" width="3" height="5"  laser:material-thickness="width" laser:press-fit="outside" />
-                <rect x="40" y="15" width="3" height="5" laser:material-thickness="width" laser:press-fit="outside" />
+                <rect x="15" y="30" width="5" height="3" laser:thickness-adjust="height" laser:press-fit="outside" />
+                <rect x="25" y="30" width="5" height="3" laser:thickness-adjust="height" laser:press-fit="outside" />
+                <rect x="40" y="5" width="3" height="5"  laser:thickness-adjust="width" laser:press-fit="outside" />
+                <rect x="40" y="15" width="3" height="5" laser:thickness-adjust="width" laser:press-fit="outside" />
             </g>
-        </g>    
-    </defs>
-
-
-        <!-- The left side of the bench-->
-        <use x="0" y="0" xlink:href="#benchSide" id="leftSide" />
-
-        <!-- The right side of the bench-->
-        <use x="208" y="0" xlink:href="#benchSide" style="x:200" id="rightSide" />
-        
-        <!-- The two bench planks-->  
-        <use x="51" y="0" xlink:href="#benchPlank" id="upperPlank" />
-        <use x="51" y="26" xlink:href="#benchPlank" id="lowerPlank" />
+        </g> 
 
 </svg>

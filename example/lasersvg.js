@@ -1,8 +1,7 @@
 /*
  *	laserSVG.js
  * 
- *	This file contains an example implementation to change the material thickness and the size of 
- *	a laserSVG compliant template. 
+ *	This file contains an example implementation of the LaserSVG features. 
  *	
  *	Copyright C2017 Florian Heller florian.heller<at>uhasselt.be
  *	
@@ -19,10 +18,19 @@
  *
  *	TODO: replace use-links to defs in the DOM
  *	TODO: ungroup groups in the working DOM
+ *  TODO: handle close-path commands (results in NaN coordinates)
+ *  TODO: only convert rects to paths when needed. 
+ *	TODO: provide a list of joint types and their parameters as info-dictionaries
+ *	TODO: Finish template generation for rects with specified material thickness attributes
+ *	TODO: rename press-fit=[Inside|Outside] to kerf-adjust=[grow|shrink]
+ *	TODO: allow user to flip direction when using flaps
+ *	TODO: create template for parametric joints to be adaptable to material thickness afterwards
+ *	TODO: get grip of holes of t-slot joints to be able to remove them if needed (possibly compound path with jumps)
  */
 
-var laser_NS = 'http://www.heller-web.net/lasersvg';
+let laser_NS = 'http://www.heller-web.net/lasersvg';
 
+var parentDocument;
 
 var laserSvgDocument;
 var laserSvgRoot;
@@ -30,37 +38,33 @@ var laserSvgRoot;
 var materialThickness = 4.0;
 var numberOfFingers = 5;
 
+var scalingFactor = 1.0;
 
 function updateThickness(newThickness) {
 
+	//Update the global material Thickness
 	materialThickness = Number(newThickness);
 
+	thickness = materialThickness;
 	// Iterate over all objects in the SVG
 	var elements = laserSvgRoot.querySelectorAll('*');
 
-	for (var i=0; i<elements.length; i++) {
-		var element = elements[i];
+	for (let element of elements) {
 		// Check if it has a material thickness attribute
-		if (element.hasAttributeNS(laser_NS,'material-thickness')) {
-			var thickness = element.getAttributeNS(laser_NS,'material-thickness');
-			switch (thickness) {
-				case 'width': element.setAttribute("width", materialThickness); break; 
-				case 'height': element.setAttribute("height", materialThickness); break; 
-				case 'both': element.setAttribute("height", materialThickness); element.setAttribute("width", materialThickness); break;
+		if (element.hasAttributeNS(laser_NS,'thickness-adjust')) {
+			var setting = element.getAttributeNS(laser_NS,'thickness-adjust');
+			switch (setting) {
+				case 'width': element.setAttribute("width", thickness); break; 
+				case 'height': element.setAttribute("height", thickness); break; 
+				case 'both': element.setAttribute("height", thickness); element.setAttribute("width", thickness); break;
 				default: break; // Results to none
 			}
 		}
 		// Check if the element has a template attribute
 		if (element.hasAttributeNS(laser_NS,'template')) {
-			// If so, use the template to resize the path correctly
-			var template = element.getAttributeNS(laser_NS,'template');
-			var thickness = Number(materialThickness);
-			if (element.hasAttributeNS(laser_NS,'thickness')) {
-				thickness = element.getAttributeNS(laser_NS,'thickness');
-			}
-			var newTemplate = template.replace(/[{](.*?thickness.*?)[}]/g, function (x) { return eval(x); });
-			console.log(newTemplate);
-			element.setAttribute("d",newTemplate);
+			// We need to multiply thickness with inverted scalingFactor as the path will be scaled afterwards
+			useTemplateWithThickness(element, thickness / scalingFactor);
+			scalePath(element);
 		}
 	}
 }
@@ -72,43 +76,70 @@ function updateScaling(scalingFactor) {
 	//var elements = laserSvgRoot.querySelectorAll('*');
 	//
 
-	var elements = laserSvgRoot.getElementsByTagName('path');
-	for (var i=0; i < elements.length; i++) {
-		element = elements[i];
-		if (element.hasAttribute("x")) {
-			element.setAttribute(Number(element.getAttribute("x"))*scalingFactor);
-		}
-		if (element.hasAttribute("y")) {
-			element.setAttribute(Number(element.getAttribute("y"))*scalingFactor);
-		}
-		if (element.hasAttribute("width")) {
-			element.setAttribute(Number(element.getAttribute("width"))*scalingFactor);
-		}
-		if (element.hasAttribute("height")) {
-			element.setAttribute(Number(element.getAttribute("height"))*scalingFactor);
-		}
-		if (element.hasAttributeNS(laser_NS,'template')) {
-			var template = element.getAttributeNS(laser_NS,'template');
-			var thickness = Number(materialThickness) / scalingFactor;
-			var newTemplate = template.replace(/[{](.*?thickness.*?)[}]/g, function (x) { return eval(x); });
-			console.log(newTemplate);
-			element.setAttribute("d",newTemplate);
+	this.scalingFactor *= scalingFactor;
 
-		}
-		if (element.hasAttribute("d")) {
-			var pathData = element.getPathData({normalize: false});
-			var newPathData = [];
-			//for (let segment in element.getPathData({normalize: true})) {
-			for (var j = 0; j<pathData.length; j++) {
-				segment = pathData[j];
-				console.log(segment);
-				segment.values[0] *= scalingFactor;
-				segment.values[1] *= scalingFactor;
-				newPathData.push(segment);
+	let tags = ['path', 'rect'];
+	for (let tag of tags) {
+		var elements = laserSvgRoot.getElementsByTagName(tag);
+		for (let element of elements) {
+			if (element.hasAttribute("x")) {
+				element.setAttribute("x", Number(element.getAttribute("x"))*scalingFactor);
 			}
-			element.setPathData(newPathData);
-		}
+			if (element.hasAttribute("y")) {
+				element.setAttribute("y", Number(element.getAttribute("y"))*scalingFactor);
+			}
+			// Get potential adjustment setting
+			var setting = "";
+			if (element.hasAttributeNS(laser_NS,'thickness-adjust')) {
+				setting = element.getAttributeNS(laser_NS,'thickness-adjust');
+			}
 
+			if (element.hasAttribute("width")) {
+				if (setting == "width" || setting == "both") {
+					element.setAttribute("width", materialThickness);
+				}
+				else {
+					element.setAttribute("width", Number(element.getAttribute("width"))*scalingFactor);
+				}
+			}
+			if (element.hasAttribute("height")) {
+				if (setting == "height" || setting == "both") {
+					element.setAttribute("height", materialThickness);
+				}
+				else {
+					element.setAttribute("height", Number(element.getAttribute("height"))*scalingFactor);
+				}
+			}
+			if (element.hasAttributeNS(laser_NS,'template')) {
+				useTemplateWithThickness(element, Number(materialThickness) / this.scalingFactor);
+			}
+			scalePath(element);
+
+		}
+	}
+}
+
+function useTemplateWithThickness(path, thickness) {
+	// If so, use the template to resize the path correctly
+	var template = path.getAttributeNS(laser_NS,'template');
+	if (path.hasAttributeNS(laser_NS,'thickness')) {
+		thickness = path.getAttributeNS(laser_NS,'thickness');
+	}
+	var newTemplate = template.replace(/[{](.*?thickness.*?)[}]/g, function (x) { return eval(x); });
+	path.setAttribute("d",newTemplate);
+}
+
+function scalePath(pathToScale) {
+	if (pathToScale.hasAttribute("d")) {
+		var newPathData = [];
+		for (let segment of pathToScale.getPathData({normalize: false})) {
+			if (segment.values.length>1) {
+				segment.values[0] *= this.scalingFactor;
+				segment.values[1] *= this.scalingFactor;
+			}
+			newPathData.push(segment);
+		}
+		pathToScale.setPathData(newPathData);
 	}
 }
 
@@ -354,14 +385,14 @@ function createJoints() {
 	for (let path of paths) {
 		// Get the direction of the joint
 		var direction = -1;
-		if (path.hasAttributeNS(laser_NS,'joint-direction')) {
-			if (path.getAttributeNS(laser_NS,'joint-direction') == 'inside') {
+		if (path.hasAttributeNS(laser_NS,'laser:joint-direction')) {
+			if (path.getAttributeNS(laser_NS,'laser:joint-direction') == 'inside') {
 				direction = 1;
 			}
 		}
 		//create a new path with the joint pattern
-		if (path.hasAttributeNS(laser_NS,'joint-type')) {
-			switch(path.getAttributeNS(laser_NS,'joint-type')) {
+		if (path.hasAttributeNS(laser_NS,'laser:joint-type')) {
+			switch(path.getAttributeNS(laser_NS,'laser:joint-type')) {
 				case 'finger': createFingerJointPath(path, 5, materialThickness * direction, numberOfFingers); break;
 				case 'flap': createFlapJointPath(path, 5, materialThickness, 2); break;
 				case 'tslot': createTSlotPath(path, 5, materialThickness * direction, numberOfFingers); break;
@@ -397,6 +428,7 @@ function replacePrimitives() {
 		pathTop.setPathData(pathData);
 		transferAttributes(rect, pathTop, "top");
 		laserSvgRoot.appendChild(pathTop)	
+		pathTop.setAttributeNS(laser_NS,"laser:template",pathTop.getAttribute("d"));
 		// Right
 		let pathRight = document.createElementNS("http://www.w3.org/2000/svg", "path");
 		var pathData = [
@@ -406,6 +438,7 @@ function replacePrimitives() {
 		pathRight.setPathData(pathData);
 		transferAttributes(rect, pathRight, "right");
 		laserSvgRoot.appendChild(pathRight);	
+		pathRight.setAttributeNS(laser_NS,"laser:template",pathRight.getAttribute("d"));
 		// Bottom
 		let pathBottom = document.createElementNS("http://www.w3.org/2000/svg", "path");
 		var pathData = [
@@ -415,6 +448,7 @@ function replacePrimitives() {
 		pathBottom.setPathData(pathData);
 		transferAttributes(rect, pathBottom, "bottom");
 		laserSvgRoot.appendChild(pathBottom);
+		pathBottom.setAttributeNS(laser_NS,"laser:template",pathBottom.getAttribute("d"));
 		// Left
 		let pathLeft = document.createElementNS("http://www.w3.org/2000/svg", "path");
 		var pathData = [
@@ -424,6 +458,7 @@ function replacePrimitives() {
 		pathLeft.setPathData(pathData);
 		transferAttributes(rect, pathLeft, "left");
 		laserSvgRoot.appendChild(pathLeft);
+		pathLeft.setAttributeNS(laser_NS,"laser:template",pathLeft.getAttribute("d"));
 
 		// Remove the original rect
 		rect.parentNode.removeChild(rect);
@@ -435,8 +470,8 @@ function replacePrimitives() {
 function transferAttributes(rect, path, orientation) {
 	let attributes = [ "", "-direction", "-type"];
 	for (let attribute of attributes) {
-		if (rect.hasAttributeNS(laser_NS,'joint-' + orientation + attribute)) {
-			path.setAttributeNS(laser_NS,'joint' + attribute, rect.getAttributeNS(laser_NS,'joint-' + orientation + attribute));
+		if (rect.hasAttributeNS(laser_NS,'laser:joint-' + orientation + attribute)) {
+			path.setAttributeNS(laser_NS,'laser:joint' + attribute, rect.getAttributeNS(laser_NS,'laser:joint-' + orientation + attribute));
 		}
 	}
 
@@ -444,14 +479,10 @@ function transferAttributes(rect, path, orientation) {
 
 
 // Callback to redraw after variables have been changed from the outside
-function updateDrawing(numberOfFingers) {
-	var fingerDisplay = document.getElementById('numberOfFingers');
- 	fingerDisplay.innerHTML = numberOfFingers
- 	console.log(numberOfFingers);
-	laserSvgScript.numberOfFingers = numberOfFingers;
-
-	laserSvgScript.createJoints();
+function updateDrawing() {
+	createJoints();
 }
+
 
 
 
@@ -459,19 +490,83 @@ function updateDrawing(numberOfFingers) {
 // This function gets called by the JavaScript embedded into the SVG file. 
 // Setting the variable allows us to access the embedded JS to update parameters.
 function svgLoaded(event){
-	// If the embedding document supports it, make our functions available
-	if(window.parent.svgDidLoad) window.parent.svgDidLoad(this);
+
 	//laserSvgScript = event;	// A pointer to this very script in order to allow an embedding document to call functions on this script
 	laserSvgDocument = event.target.ownerDocument;	// A pointer to our own SVG document, to make sure we have the correct pointer even if we are embedded in another document
 	laserSvgRoot = laserSvgDocument.documentElement;	// The DOM-Root of our svg document.
-		// TODO: remove groups by applying their transforms to the child elements.
-		// TODO: how to work with defs? Do we need to replace them in the DOM?
-		// Replace Primitives with singles paths
-		replacePrimitives();
-		// Create the joints as specified by the parameters
-		createJoints();
-		// TODO: draw the lines visualizing the connections.
+
+	if (laserSvgRoot.hasAttributeNS(laser_NS,"laser:material-thickness")) {
+		materialThickness = laserSvgRoot.getAttributeNS(laser_NS,"laser:material-thickness")
+	}
+
+	// TODO: remove groups by applying their transforms to the child elements.
+	// TODO: how to work with defs? Do we need to replace them in the DOM?
+	// Replace Primitives with singles paths
+	//replacePrimitives();
+	// Create the joints as specified by the parameters
+	createJoints();
+	// TODO: draw the lines visualizing the connections.
+	// Add the event handlers for editing
+	addEditEventHandlers();
+
+	// If the embedding document supports it, make our functions available
+	if(window.parent.svgDidLoad) { 
+		parentDocument = window.parent; //We need this pointer in edit mode
+		window.parent.svgDidLoad(this);
+	}
 }
+
+/* 
+ * Functions that provide functionality to be called from the host script. This is not invoked from the drawing itself.
+ */
+
+var currentSelection;
+
+function setPropertyForSelection(property, value) {
+	console.log("Set Property " + property + " to " + value + " on " + currentSelection + " in namespace " + laser_NS);
+	currentSelection.setAttributeNS(laser_NS, "laser:" + property, value);
+	console.log(currentSelection.outerHTML);
+}
+
+function addEditEventHandlers() {
+	let tags = ['path', 'rect'];
+	for (var tag of tags) {
+		let elements = laserSvgRoot.getElementsByTagName(tag);
+		for (let element of elements) {
+			element.onclick = function () {
+				// clear selection by removing the selected class from all other tags
+				for (let e of laserSvgRoot.querySelectorAll('.selected')) {
+					e.classList.remove("selected");
+					if (e.getAttribute("class") == "" ) { e.removeAttribute("class"); } // Leave a clean DOM
+				}
+				currentSelection = this;
+				this.classList.add("selected");
+				parentDocument.didSelectElement(this); //Notify the host script
+			}
+		}
+	}
+}
+
+function removeEditEventHandlers() {
+	let tags = ['path', 'rect'];
+	for (var tag of tags) {
+		let elements = laserSvgRoot.getElementsByTagName(tag);
+		for (var element of elements) {
+			element.onclick = null;
+		}
+	}
+}
+
+
+function redrawSelection() {
+	var elements = laserSvgRoot.querySelectorAll('.selected');
+	for (let element in elements) {
+		if (element != currentSelection) {
+			element.classList.remove("selected");
+		}
+	}
+}
+
 
 function getImageForExport() {
 	// TODO: remove the lines vizualizing the connections

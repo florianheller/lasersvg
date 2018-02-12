@@ -1,30 +1,27 @@
-#svg-container {
-	width: 800px;
-  height: 500px;
-	border-width: 1px;
-	border-color: #384C6C;
-	border-style: solid;
+@namespace laser 'http://www.heller-web.net/lasersvg';
+@namespace xlink 'http://www.w3.org/1999/xlink';
+
+svg {
 	background-color: #F5F6F8;
+	padding:5px;
 }
 
-#svg-container svg {
-	border-width: 1px;
-	border-color: #000;
-	border-style: solid;
-}
-
-#inner {
-	fill:#A9CE38;
+path, rect, circle {
+	stroke-width: 0.5px;
 	stroke: #384C6C;
-}
-
-circ:nth-child(2n+1) {
-	stroke-width:7px;
-}
-#triangle {
+	stroke-linecap: square;
 	fill: none;
-	stroke: #384C6C;
 }
-path:nth-child(n+1) {
-	stroke-width:7px;
+
+.selected {
+	stroke: #324461;
+	stroke-width: 0.75px;
 }
+
+[laser|joint] {
+	stroke: #A9CE38;
+	//stroke-dasharray: 5,10,5;
+	//fill: none;
+}
+
+
