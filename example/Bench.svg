@@ -33,6 +33,14 @@
                 <rect x="40" y="5" width="3" height="5"  laser:thickness-adjust="width" laser:press-fit="outside" />
                 <rect x="40" y="15" width="3" height="5" laser:thickness-adjust="width" laser:press-fit="outside" />
             </g>
-        </g> 
-
+    </g> 
+    <g id="benchSide" fill="#F5F6F8">
+        <rect x="210" y="0" width="50" height="50"/>
+        <g fill="#E1E4E9" stroke="#A9CE38" stroke-width="0.2">
+            <rect x="225" y="30" width="5" height="3" laser:thickness-adjust="height" laser:press-fit="outside" />
+    	    <rect x="235" y="30" width="5" height="3" laser:thickness-adjust="height" laser:press-fit="outside" />
+            <rect x="250" y="5" width="3" height="5"  laser:thickness-adjust="width" laser:press-fit="outside" />
+            <rect x="250" y="15" width="3" height="5" laser:thickness-adjust="width" laser:press-fit="outside" />
+        </g>
+    </g> 
 </svg>
