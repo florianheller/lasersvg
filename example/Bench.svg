@@ -7,10 +7,10 @@
     http://github.com/florianheller/lasersvg
     http://www.heller-web.net/lasersvg
 -->
-<?xml-stylesheet type="text/css" href="lasersvg.css"?>
-<svg width="200mm" height="100mm" version="1.1" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:laser="http://www.heller-web.net/lasersvg" onload="svgLoaded(evt)" laser:material-thickness="3">
-<script type="text/javascript" xlink:href="lasersvg.js" />
-<script type="text/javascript" xlink:href="path-data-polyfill.js" />
+<?xml-stylesheet type="text/css" href="http://www2.heller-web.net/LaserSVG2/lasersvg.css"?>
+<svg width="270mm" height="100mm" version="1.1" viewBox="0 0 270 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:laser="http://www.heller-web.net/lasersvg" onload="svgLoaded(evt)" laser:material-thickness="3">
+<script type="text/javascript" xlink:href="http://www2.heller-web.net/LaserSVG2/lasersvg.js" />
+<script type="text/javascript" xlink:href="http://www2.heller-web.net/LaserSVG2/path-data-polyfill.js" />
 	<path id="benchPlank" d="m 55 0 
             l 150 0 l 0 5 l 3 0 l 0 5 l -3 0 l 0 5 l 3 0 l 0 5 l -3 0 l 0 5 
             l -150 0 l 0 -5 l -3 0 l 0 -5 l 3 0 l 0 -5 l -3 0 l 0 -5 l 3 0 z" laser:template="m 55 0 
