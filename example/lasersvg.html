@@ -6,15 +6,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="style.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="SVGPathData.js"></script>
     <title>LaserSVG</title>
   </head>
   <body>
     <h1>LaserSVG Demo</h1>
     <div id="fileHandling">
-      <button id="loadButton">Open File</button> 
-      <button id="saveButton" onclick="exportSVG()">Save File</button>
+      <input type='file' onchange='openFile(this.files)' accept="image/svg" id="fileInput" style="display:none;"></input>
+      <button id="loadButton">Open File</button>
+      <button id="saveButton" onclick="saveSVG();" title="Save as a LaserSVG file">Save File</button>
+      <button id="exportButton" onclick="exportSVG();" title="Export for laser cutting by applying all transformations.">Export File</button>
     </div>
-    <p style="border: 1px solid #384C6C; padding: 15px;">
+    <p id="container">
         <object id="drawingObject" data="Bench.svg" type="image/svg+xml" ></object>
     </p>
     <div id="controlPanels">
@@ -28,13 +31,14 @@
         <span id="materialThickness">3.5</span> mm
       </div>
       </div>
-      <div id="parameters">
+      <div id="parameters" class="hidden">
         <h3>Parameters</h3>
         
           <div id="pathThickness">
             <p>Material Thickness: 
-            <div id="pathTemplate" title="Replace the dimensions that are dependent on material thickness with {thickness}. Calculations such as {0.5*thickness} are possible." contenteditable></div>
-            <button type="button" id="pathTemplateSave" onclick="savePathTemplate()">Apply</button>
+            <div id="pathTemplate" title="Replace the dimensions that are dependent on material thickness with {thickness}. Calculations such as {0.5*thickness} are possible." contenteditable onmouseup="updatePathSelection(this,0)" onkeyup="updatePathSelection(this,0)"></div>
+            <button type="button" id="convertToThickness" onclick="convertToThickness()">Convert</button>
+            <button type="button" id="pathTemplateSave" onclick="setPathTemplate()">Apply</button>
             </p>
           </div>
           <div id="primitiveThickness">Thickness adjustment:
@@ -46,11 +50,19 @@
           </select>
           </div>
         <p>Kerf adjustment:  
+          <div id="kerfMaskEditing">
+            <div id="kerfMask" title="Replace the corresponding entries in the mask with s to shrink or g to grow." contenteditable onmouseup="updatePathSelection(this,1)" onkeyup="updatePathSelection(this,1)"></div>
+            <button type="button" id="kerfMaskSave" onclick="setKerfMask()">Apply</button>
+          </div>
           <select id="kerfSelection" onchange="setKerfAdjustment()">
             <option value="none"></option>
-            <option value="inside">Inside</option>
-            <option value="outside">Outside</option>
+            <option value="shrink">Shrink</option>
+            <option value="grow">Grow</option>
           </select>
+        </p>
+        <h4>Parametric joints</h4>
+        <p>Rectangle side:<br />
+          <svg width="50" height="50" id="rectangleSelection"><path d="M 0 0 l 50 0" onClick="didSelectRectSide(0);"/><path d="M 50 0 l 0 50" onClick="didSelectRectSide(1);" /><path d="M 0 50 l 50 0" onClick="didSelectRectSide(2);"/><path d="M 0 0 l 0 50" onClick="didSelectRectSide(3);"/></svg>
         </p>
         <p>Joint Type
           <select id="jointTypeSelection" onchange="setJointType()">

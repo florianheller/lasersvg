@@ -27,26 +27,40 @@
  *	TODO: allow user to flip direction when using flaps
  *	TODO: create template for parametric joints to be adaptable to material thickness afterwards
  *	TODO: get grip of holes of t-slot joints to be able to remove them if needed (possibly compound path with jumps)
+ *	TODO: add handling for ellipses, polygons, and polylines (https://www.w3.org/TR/SVG2/shapes.html#EllipseElement)
  */
 
-let laser_NS = 'http://www.heller-web.net/lasersvg';
+const laser_NS = 'http://www.heller-web.net/lasersvg';
 
+// References to the different points in the DOM
 var parentDocument;
-
 var laserSvgDocument;
 var laserSvgRoot;
 
+//Global settings for the drawing
 var materialThickness = 4.0;
+var kerf = 0.2;
+
+// Global settings for the parametric tools
 var numberOfFingers = 5;
 
+// Global scaling factor
 var scalingFactor = 1.0;
+
+
+/************************* Thickness, Scale, and Kerf ****************************************************/
+
+
+/* Adjusts the drawing to a new material thickness
+ * @param newThickness: the new material thickness
+ */
 
 function updateThickness(newThickness) {
 
 	//Update the global material Thickness
 	materialThickness = Number(newThickness);
 
-	thickness = materialThickness;
+	var thickness = materialThickness;
 	// Iterate over all objects in the SVG
 	var elements = laserSvgRoot.querySelectorAll('*');
 
@@ -70,8 +84,13 @@ function updateThickness(newThickness) {
 	}
 }
 
-
-function updateScaling(scalingFactor) {
+/* Scales the drawing by the factor given as parameter
+ * calling it with 0.5 means that the drawing is reduced to half the size while
+ * calling it with a scaling factor of 2 will double its size
+ * Calling the function twice with factor 2 will result in a 4x magnification
+ * @param scalingFactor relative scaling factor 
+ */ 
+function scale(scalingFactor) {
 
 	//iterate over all objects and scale them accordingly
 	//var elements = laserSvgRoot.querySelectorAll('*');
@@ -144,7 +163,114 @@ function scalePath(pathToScale) {
 	}
 }
 
+/* Adjusts the size and position of elements that need to be adapted to compensate for the kerf
+ * Takes no parameters as the kerf is set globally
+ */
+function adjustForKerf() {
+	// We only do kerf adjust for paths, rects, and circles
+	console.log("Adjust for kerf");
+	let tags = ['path', 'rect', 'circle'];
+	for (let tag of tags) {
+		let elements = laserSvgRoot.getElementsByTagName(tag);
+		for (let element of elements) {
+			if (element.hasAttributeNS(laser_NS,'kerf-adjust')) {
+				let setting = element.getAttributeNS(laser_NS,'kerf-adjust');
+				var offset = kerf; //Kerf adjustment should be scaling invariant
+						if (setting=="shrink") { 
+							offset = -offset;
+						} 
+				switch(tag) {
+					case "rect": 
+						if (element.hasAttribute("x")) {
+							element.setAttribute("x", Number(element.getAttribute("x")) - offset/2);
+						}
+						if (element.hasAttribute("y")) {
+							element.setAttribute("y", Number(element.getAttribute("y")) - offset/2);
+						}
+						if (element.hasAttribute("width")) {
+							element.setAttribute("width", Number(element.getAttribute("width")) + offset);
+						}
+						if (element.hasAttribute("height")) {
+							element.setAttribute("height", Number(element.getAttribute("height")) + offset);
+						}
+						break;
+					case "circle": // No need to adjust the center coordinates
+						if (element.hasAttribute("r")) {
+							element.setAttribute("r", Number(element.getAttribute("r")) + offset);
+						}
+						break;
+					default: break;
+				}
+			}
+			else if (element.hasAttributeNS(laser_NS,'kerf-mask') && tag == "path") {
+				applyKerfMaskToPath(element);
+			}
+		} // End elements 
+	} // End Tag
+}
 
+function applyKerfMaskToPath(path) {
+	if (!path.hasAttributeNS(laser_NS, "kerf-mask")) { return; } //If no kerf-mask present, we can't apply it. 
+	let kerfMaskArray = path.getAttributeNS(laser_NS, "kerf-mask").split(" "); //Note that there is no marker for the first M command
+	let pathData = path.getPathData({normalize: false}); //We work on relative coordinates
+	if (kerfMaskArray.length != pathData.length-1) {console.log("Kerf-mask is incomplete"); return; }
+	for (let i=0; i<kerfMaskArray.length; i++) {
+		let setting = kerfMaskArray[i]
+		switch(setting) {
+			case 's':  changePathSegmentLength(pathData[i], kerf/2); break;
+			case 'g': changePathSegmentLength(pathData[i], -kerf/2); break;
+			case 'S':  changePathSegmentLength(pathData[i], kerf); break;
+			case 'G': changePathSegmentLength(pathData[i], -kerf); break;
+			default: break; //nothing to do
+		}
+	}
+	console.log(pathData);
+
+}
+
+function changePathSegmentLength(pathData, offset) {	
+	//Calculate the direction of the relative vector
+	let angle = Math.atan2(pathData.values[1], pathData.values[0]);
+	pathData.values[0] += (Math.round(Math.cos(angle)*100000)/100000)*offset;
+	pathData.values[1] += (Math.round(Math.sin(angle)*100000)/100000)*offset; 
+}
+
+/************************* Visualization Helpers  ****************************************************/
+/* This function highlights a certain path segment (e.g., to show selection).
+ * It takes a path reference and an index of which subpath to highlight. It then creates a new path that overlays the original one
+ * @param path: A reference to the path
+ * @param segmentIndex: the (non-negative) index of the subpath to highlight. Usually the first instruction in a path is a move-command, so the first line starts at index 1
+ * @param type: if multiple selections can occur, specifiy a different type for every selection. This reflects in the CSS selectors .pathHilight-type
+ */
+function highlightPathSegment(path, segmentIndex, type) {
+	if (segmentIndex < 0) { return; } //Safety check
+	let pathData = path.getPathData({normalize: true}); // Returns absolute coordinates
+
+	if (segmentIndex >= pathData.length) { return; } //Index out of bounds
+	let start = pathData[segmentIndex-1].values;
+	let end = pathData[segmentIndex].values;
+
+	let highlight = document.createElementNS("http://www.w3.org/2000/svg", "path");
+	let newPathData = [
+			{ type: "M", values: start },
+			{ type: "L", values: end }
+		]; 
+	highlight.setPathData(newPathData);
+	//Remove all previous highlights
+	for (let e of laserSvgRoot.querySelectorAll(".pathHighlight-"+type)) {
+		e.parentNode.removeChild(e);
+	}
+
+	//highlight.classList.add("selected");
+	highlight.classList.add("pathHighlight-"+type); 
+
+	laserSvgRoot.appendChild(highlight);		
+}
+
+
+
+
+/************************* Parametric Fabrication ****************************************************/
 
 // @param path: the path to replace. Only the connection between the first two points is considered.
 // @param gap:  the gap between the origin of the path and the first finger
@@ -283,12 +409,12 @@ function createTSlotPath(path, gap, inset, fingers) {
 	//This length has to be divided into /fingers/ fingers and fingers-1 gaps
 	let fingerSize = edgeLength / (2 * fingers - 1);
 
+    var newPathData = []; 
 	
 	if (inset < 0) {
 
 		//The first element of the first path segment list, as this determines the origin
-		// 
-		var newPathData = []; 
+
 		newPathData.push(pathData[0]);
 	 	
 	 	newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
@@ -337,7 +463,6 @@ function createTSlotPath(path, gap, inset, fingers) {
 	}
 	else {
 
-		var newPathData = []; 
 		newPathData.push(pathData[0]);
 	 	
 	 	newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
@@ -428,7 +553,7 @@ function replacePrimitives() {
 		]; 
 		pathTop.setPathData(pathData);
 		transferAttributes(rect, pathTop, "top");
-		laserSvgRoot.appendChild(pathTop)	
+		laserSvgRoot.appendChild(pathTop);	
 		pathTop.setAttributeNS(laser_NS,"laser:template",pathTop.getAttribute("d"));
 		// Right
 		let pathRight = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -491,13 +616,17 @@ function updateDrawing() {
 // This function gets called by the JavaScript embedded into the SVG file. 
 // Setting the variable allows us to access the embedded JS to update parameters.
 function svgLoaded(event){
-
+	console.log("SVG Loaded");
+	if (event.target != null) {laserSvgDocument = event.target.ownerDocument; }
+	else {laserSvgDocument = event;}
 	//laserSvgScript = event;	// A pointer to this very script in order to allow an embedding document to call functions on this script
-	laserSvgDocument = event.target.ownerDocument;	// A pointer to our own SVG document, to make sure we have the correct pointer even if we are embedded in another document
+	//laserSvgDocument = event.target.ownerDocument;	// A pointer to our own SVG document, to make sure we have the correct pointer even if we are embedded in another document
 	laserSvgRoot = laserSvgDocument.documentElement;	// The DOM-Root of our svg document.
-
-	if (laserSvgRoot.hasAttributeNS(laser_NS,"laser:material-thickness")) {
-		materialThickness = laserSvgRoot.getAttributeNS(laser_NS,"laser:material-thickness")
+	if (laserSvgRoot.hasAttributeNS(laser_NS,"material-thickness")) {
+		materialThickness = laserSvgRoot.getAttributeNS(laser_NS,"material-thickness");
+	}
+	if (laserSvgRoot.hasAttributeNS(laser_NS,"kerf")) {
+		kerf = laserSvgRoot.getAttributeNS(laser_NS,"kerf");
 	}
 
 	// TODO: remove groups by applying their transforms to the child elements.
@@ -506,6 +635,7 @@ function svgLoaded(event){
 	//replacePrimitives();
 	// Create the joints as specified by the parameters
 	createJoints();
+
 	// TODO: draw the lines visualizing the connections.
 	// Add the event handlers for editing
 	addEditEventHandlers();
@@ -515,6 +645,7 @@ function svgLoaded(event){
 		parentDocument = window.parent; //We need this pointer in edit mode
 		window.parent.svgDidLoad(this);
 	}
+
 }
 
 /* 
@@ -530,7 +661,7 @@ function setPropertyForSelection(property, value) {
 }
 
 function addEditEventHandlers() {
-	let tags = ['path', 'rect'];
+	let tags = ['path', 'rect', 'circle'];
 	for (var tag of tags) {
 		let elements = laserSvgRoot.getElementsByTagName(tag);
 		for (let element of elements) {
@@ -569,10 +700,24 @@ function redrawSelection() {
 }
 
 
+function getImageForSaving() {
+	let serializer = new XMLSerializer();
+	return serializer.serializeToString(laserSvgRoot);
+}
+
 function getImageForExport() {
 	// TODO: remove the lines vizualizing the connections
 	// TODO: remove the interactivity (onMouseOver etc.)
 
+	//Adjust for Kerf if required
+	adjustForKerf();
+
 	let serializer = new XMLSerializer();
 	return serializer.serializeToString(laserSvgRoot);
 }
+
+// If the file was not yet a LaserSVG File, then the onload statement is missing and the callback never gets called
+// therefore, we call it once again here. The callback performs a check wether it was already called or not. 
+document.addEventListener("DOMContentLoaded", function(e) {
+      svgLoaded(document);
+});
