@@ -3,7 +3,6 @@
 
 svg {
 	background-color: #F5F6F8;
-	padding:5px;
 }
 
 path, rect, circle {
@@ -15,7 +14,12 @@ path, rect, circle {
 
 .selected {
 	stroke: #324461;
-	stroke-width: 0.75px;
+	stroke-width: 0.5px; 
+	outline: 1px solid #A9CE38;
+}
+
+.pathHighlight-pathTemplate {
+	stroke: magenta;
 }
 
 [laser|joint] {
