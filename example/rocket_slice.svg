@@ -19,7 +19,10 @@
 
 
 <circle cx="25" cy="25" r="25" stroke="#384C6C" stroke-width="0.5" fill="#E1E4E9" />
-<path d="M22.5, 7 l5,0 l0,20 l17.3,10 l-2.5,4.3 l-17.3,-10 l-17.3,10 l-2.5,-4.3 l17.3,-10 l0,-20 z " laser:template="M{25-0.5*thickness},{height + Math.sin(0) * thickness} l{thickness},0 l0,20 l17.3,10 l{-0.5*thickness},{0.866*thickness} l-17.3,-10 l-17.3,10 l{-0.5*thickness},{-0.866*thickness} l17.3,-10 l0,-20 z" stroke="#384C6C" stroke-width="0.5" fill="#E1E4E9"/>
+<circle cx="25" cy="25" r="21.011278731550906" stroke="#384C6C" stroke-width="0.5" fill="#E1E4E9" />
+
+<path d="M22.5, 7 l5,0 l0,20 l17.3,10 l-2.5,4.3 l-17.3,-10 l-17.3,10 l-2.5,-4.3 l17.3,-10 l0,-20 z " laser:template="M{25-0.5*thickness},{var x1=0; var y1 = 0; var x2 = 0.5*thickness + 17.3 - Math.cos(Math.PI/3)*0.5*thickness; var y2 = 20 + Math.sin(Math.PI/6)*20 + Math.sin(Math.PI/3)*0.5*thickness;
+		var x3 = - 0.5*thickness - 17.3 + Math.cos(Math.PI/3)*0.5*thickness; var y3 = 20 + Math.sin(Math.PI/6)*20 + Math.sin(Math.PI/3)*0.5*thickness; var a = Math.hypot(x2-x1, y2-y1); var b = Math.hypot(x3-x2, y3-y2); var c = Math.hypot(x1-x3, y1-y3); var g = (17.3 * 2) + 2.5; var h = 20 + 10 + 2.15; var A = 0.5 * g * h; var R = (a * b * c)/(4*A); console.log(R); } l{thickness},0 l0,20 l17.3,10 l{-0.5*thickness},{0.866*thickness} l-17.3,-10 l-17.3,10 l{-0.5*thickness},{-0.866*thickness} l17.3,-10 l0,-20 z" stroke="#384C6C" stroke-width="0.5" fill="#E1E4E9"/>
 
 
 </svg>
