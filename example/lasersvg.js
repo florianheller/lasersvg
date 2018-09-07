@@ -145,7 +145,17 @@ function useTemplateWithThickness(path, thickness) {
 	if (path.hasAttributeNS(laser_NS,'thickness')) {
 		thickness = path.getAttributeNS(laser_NS,'thickness');
 	}
-	var newTemplate = template.replace(/[{](.*?thickness.*?)[}]/g, function (x) { return eval(x); });
+
+	//var newTemplate = template.replace(/[{](.*?thickness.*?)[}]/g, function (x) { console.log(x); result = eval(x); if (result == undefined) {return "";}  else  {return eval(x);} });
+	var newTemplate = template.replace(/[{](.*?)[}]/g, function (x) { console.log(x); result = eval(x); if (result == undefined) {return "";}  else  {return eval(x);} });
+	
+	/*var newTemplate = template.replace(/[{](.*?thickness.*?)[}]/g, function (x) {  
+		// First create a function out of x:
+		// In the normal case with thickness calculations, we could just place a return in front of it.
+		var calc = new Function('thickness', "return " + x.slice(1,-1)); 
+		return calc(thickness) });
+	*/
+	console.log(newTemplate);
 	path.setAttribute("d",newTemplate);
 }
 
