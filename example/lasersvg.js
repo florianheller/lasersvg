@@ -146,8 +146,6 @@ function useTemplateWithThickness(path, thickness) {
 		thickness = path.getAttributeNS(laser_NS,'thickness');
 	}
 
-	//var newTemplate = template.replace(/[{](.*?thickness.*?)[}]/g, function (x) { console.log(x); result = eval(x); if (result == undefined) {return "";}  else  {return eval(x);} });
-	//var newTemplate = template.replace(/[{](.*?)[}]/g, function (x) { result = eval(x); if (result == undefined) {return "";}  else  {return result;} });
 	
 	var newTemplate = template.replace(/[{](.*?)[}]/g, function (x) {  
 		// First create a function out of x:
