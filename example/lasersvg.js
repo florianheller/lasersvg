@@ -147,14 +147,22 @@ function useTemplateWithThickness(path, thickness) {
 	}
 
 	//var newTemplate = template.replace(/[{](.*?thickness.*?)[}]/g, function (x) { console.log(x); result = eval(x); if (result == undefined) {return "";}  else  {return eval(x);} });
-	var newTemplate = template.replace(/[{](.*?)[}]/g, function (x) { result = eval(x); if (result == undefined) {return "";}  else  {return result;} });
+	//var newTemplate = template.replace(/[{](.*?)[}]/g, function (x) { result = eval(x); if (result == undefined) {return "";}  else  {return result;} });
 	
-	/*var newTemplate = template.replace(/[{](.*?thickness.*?)[}]/g, function (x) {  
+	var newTemplate = template.replace(/[{](.*?)[}]/g, function (x) {  
 		// First create a function out of x:
+		let calc;
+		// If there are any variable assignments in the calculation, we can't place the return statement in front of the expression, it needs to be at the end. 
 		// In the normal case with thickness calculations, we could just place a return in front of it.
-		var calc = new Function('thickness', "return " + x.slice(1,-1)); 
+		if (!x.includes("=")) {
+			calc = new Function('thickness', "return " + x.slice(1,-1)); 
+		}
+		else {
+			calc = new Function('thickness', x.slice(1,-1)); 
+		}
+		
 		return calc(thickness) });
-	*/
+	
 	path.setAttribute("d",newTemplate);
 }
 
