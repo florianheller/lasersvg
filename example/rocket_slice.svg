@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+    LaserSVG sample file to illustrate the features
+    Author: Florian Heller florian.heller<at>uhasselt.be
+    Copyright: C2017 
+    
+    http://github.com/florianheller/lasersvg
+    http://www.heller-web.net/lasersvg
+-->
+<?xml-stylesheet type="text/css" href="lasersvg.css"?>
+<svg width="270mm" height="100mm" version="1.1" viewBox="-5 -5 270 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:laser="http://www.heller-web.net/lasersvg" laser:material-thickness="3" laser:kerf="0.2">
+<script type="text/javascript" xlink:href="lasersvg.js" />
+<script type="text/javascript" xlink:href="http://www2.heller-web.net/LaserSVG2/path-data-polyfill.js" />
+<script type="text/javascript" >
+
+	var height = 25 - 21.426;
+	console.log(height);
+</script>
+
+
+<circle cx="25" cy="25" r="25" stroke="#384C6C" stroke-width="0.5" fill="#E1E4E9" />
+<path d="M22.5, 7 l5,0 l0,20 l17.3,10 l-2.5,4.3 l-17.3,-10 l-17.3,10 l-2.5,-4.3 l17.3,-10 l0,-20 z " laser:template="M{25-0.5*thickness},{height + Math.sin(0) * thickness} l{thickness},0 l0,20 l17.3,10 l{-0.5*thickness},{0.866*thickness} l-17.3,-10 l-17.3,10 l{-0.5*thickness},{-0.866*thickness} l17.3,-10 l0,-20 z" stroke="#384C6C" stroke-width="0.5" fill="#E1E4E9"/>
+
+
+</svg>
