@@ -147,7 +147,7 @@ function useTemplateWithThickness(path, thickness) {
 	}
 
 	//var newTemplate = template.replace(/[{](.*?thickness.*?)[}]/g, function (x) { console.log(x); result = eval(x); if (result == undefined) {return "";}  else  {return eval(x);} });
-	var newTemplate = template.replace(/[{](.*?)[}]/g, function (x) { console.log(x); result = eval(x); if (result == undefined) {return "";}  else  {return eval(x);} });
+	var newTemplate = template.replace(/[{](.*?)[}]/g, function (x) { result = eval(x); if (result == undefined) {return "";}  else  {return result;} });
 	
 	/*var newTemplate = template.replace(/[{](.*?thickness.*?)[}]/g, function (x) {  
 		// First create a function out of x:
@@ -155,7 +155,6 @@ function useTemplateWithThickness(path, thickness) {
 		var calc = new Function('thickness', "return " + x.slice(1,-1)); 
 		return calc(thickness) });
 	*/
-	console.log(newTemplate);
 	path.setAttribute("d",newTemplate);
 }
 
