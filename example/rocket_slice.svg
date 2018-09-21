@@ -8,7 +8,7 @@
     http://www.heller-web.net/lasersvg
 -->
 <?xml-stylesheet type="text/css" href="lasersvg.css"?>
-<svg width="270mm" height="100mm" version="1.1" viewBox="-5 -5 270 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:laser="http://www.heller-web.net/lasersvg" laser:material-thickness="3" laser:kerf="0.2">
+<svg width="100mm" height="100mm" version="1.1" viewBox="-5 -5 150 150" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:laser="http://www.heller-web.net/lasersvg" laser:material-thickness="5" laser:kerf="0.2">
 <script type="text/javascript" xlink:href="lasersvg.js" />
 <script type="text/javascript" xlink:href="http://www2.heller-web.net/LaserSVG2/path-data-polyfill.js" />
 
