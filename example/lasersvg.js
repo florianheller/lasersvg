@@ -98,7 +98,7 @@ function scale(scalingFactor) {
 
 	this.scalingFactor *= scalingFactor;
 
-	let tags = ['path', 'rect'];
+	let tags = ['path', 'rect', 'circle'];
 	for (let tag of tags) {
 		var elements = laserSvgRoot.getElementsByTagName(tag);
 		for (let element of elements) {
@@ -107,6 +107,9 @@ function scale(scalingFactor) {
 			}
 			if (element.hasAttribute("y")) {
 				element.setAttribute("y", Number(element.getAttribute("y"))*scalingFactor);
+			}
+			if (element.hasAttribute("r")) {
+				element.setAttribute("r", Number(element.getAttribute("r"))*scalingFactor);
 			}
 			// Get potential adjustment setting
 			var setting = "";
