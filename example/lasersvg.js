@@ -163,7 +163,7 @@ function useTemplateWithThickness(path, thickness) {
 		}
 		
 		return calc(thickness) });
-	
+	console.log(newTemplate)
 	path.setAttribute("d",newTemplate);
 }
 
@@ -322,25 +322,44 @@ function createFingerJointPath(path, gap, inset, fingers) {
 	//The first element of the first path segment list, as this determines the origin
 	// 
 	var newPathData = []; 
+	var newTemplate = [];
 	newPathData.push(pathData[0]);
- 	
+ 	newTemplate.push(pathData[0]);
+
  	newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
- 	
+ 	newTemplate.push({type: "l", values: [(cos * gap), (sin * gap)]});
+
 	//We are now at the point to add the first finger
 	for (var i = 0; i < fingers; i += 1) {
  		newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * inset), (Math.sin(alpha+(Math.PI/2)) * inset)]});
+ 		newTemplate.push({type: "l", values: ["{" + (Math.cos(alpha+(Math.PI/2)) * inset/materialThickness + "*thickness}"), "{" + (Math.sin(alpha+(Math.PI/2)) * inset/materialThickness + "*thickness}")]});
+
  		newPathData.push({type: "l", values: [(cos * fingerSize), (sin * fingerSize)]});
+ 		newTemplate.push({type: "l", values: [(cos * fingerSize), (sin * fingerSize)]});
+
  		newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * inset), (Math.sin(alpha-(Math.PI/2)) * inset)]});
+ 		newTemplate.push({type: "l", values: ["{" +(Math.cos(alpha-(Math.PI/2))* inset/materialThickness + "*thickness}"), "{" + (Math.sin(alpha-(Math.PI/2)) * inset/materialThickness + "*thickness}")]});
 
 		if (i != fingers-1) {
 			newPathData.push({type: "l", values: [cos * fingerSize, sin * fingerSize]});
+			newTemplate.push({type: "l", values: [cos * fingerSize, sin * fingerSize]});
 		}
 	}
 
 	// Close the second gap
 	newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
+	newTemplate.push({type: "l", values: [(cos * gap), (sin * gap)]});
+
 
 	path.setPathData(newPathData);
+
+	//We need to convert the pathSegment list into a string that we can store as template
+	let tempPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+	tempPath.setPathData(newTemplate);
+	let tempTemplate = tempPath.getAttribute("d")
+
+	path.setAttributeNS(laser_NS, "laser:template", tempPath.getAttribute("d"));
+
 	
 }
 
@@ -529,14 +548,14 @@ function createJoints() {
 	for (let path of paths) {
 		// Get the direction of the joint
 		var direction = -1;
-		if (path.hasAttributeNS(laser_NS,'laser:joint-direction')) {
-			if (path.getAttributeNS(laser_NS,'laser:joint-direction') == 'inside') {
+		if (path.hasAttributeNS(laser_NS,'joint-direction')) {
+			if (path.getAttributeNS(laser_NS,'joint-direction') == 'inside') {
 				direction = 1;
 			}
 		}
 		//create a new path with the joint pattern
-		if (path.hasAttributeNS(laser_NS,'laser:joint-type')) {
-			switch(path.getAttributeNS(laser_NS,'laser:joint-type')) {
+		if (path.hasAttributeNS(laser_NS,'joint-type')) {
+			switch(path.getAttributeNS(laser_NS,'joint-type')) {
 				case 'finger': createFingerJointPath(path, 5, materialThickness * direction, numberOfFingers); break;
 				case 'flap': createFlapJointPath(path, 5, materialThickness, 2); break;
 				case 'tslot': createTSlotPath(path, 5, materialThickness * direction, numberOfFingers); break;
@@ -558,10 +577,14 @@ function replacePrimitives() {
 		rect = rects[0];
 
 		//Get the origin and dimensions of the rect
-		let x = Number(rect.getAttribute("x"));
-		let y = Number(rect.getAttribute("y"));
-		let width = Number(rect.getAttribute("width"));
-		let height = Number(rect.getAttribute("height"));
+		// let x = rect.x.baseVal.valueInSpecifiedUnits;
+		// let y = rect.y.baseVal.valueInSpecifiedUnits;
+		// let width = rect.width.baseVal.valueInSpecifiedUnits;
+		// let height = rect.height.baseVal.valueInSpecifiedUnits;
+		let x = rect.x.baseVal.value;
+		let y = rect.y.baseVal.value;
+		let width = rect.width.baseVal.value;
+		let height = rect.height.baseVal.value;
 
 		// Top
 		let pathTop = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -582,7 +605,7 @@ function replacePrimitives() {
 		pathRight.setPathData(pathData);
 		transferAttributes(rect, pathRight, "right");
 		laserSvgRoot.appendChild(pathRight);	
-		pathRight.setAttributeNS(laser_NS,"laser:template",pathRight.getAttribute("d"));
+		pathRight.setAttributeNS(laser_NS,"template",pathRight.getAttribute("d"));
 		// Bottom
 		let pathBottom = document.createElementNS("http://www.w3.org/2000/svg", "path");
 		var pathData = [
@@ -614,8 +637,8 @@ function replacePrimitives() {
 function transferAttributes(rect, path, orientation) {
 	let attributes = [ "", "-direction", "-type"];
 	for (let attribute of attributes) {
-		if (rect.hasAttributeNS(laser_NS,'laser:joint-' + orientation + attribute)) {
-			path.setAttributeNS(laser_NS,'laser:joint' + attribute, rect.getAttributeNS(laser_NS,'laser:joint-' + orientation + attribute));
+		if (rect.hasAttributeNS(laser_NS,'joint-' + orientation + attribute)) {
+			path.setAttributeNS(laser_NS,'joint' + attribute, rect.getAttributeNS(laser_NS,'joint-' + orientation + attribute));
 		}
 	}
 
@@ -650,7 +673,7 @@ function svgLoaded(event){
 	// TODO: remove groups by applying their transforms to the child elements.
 	// TODO: how to work with defs? Do we need to replace them in the DOM?
 	// Replace Primitives with singles paths
-	//replacePrimitives();
+	replacePrimitives();
 	// Create the joints as specified by the parameters
 	createJoints();
 
@@ -665,6 +688,26 @@ function svgLoaded(event){
 	}
 
 }
+
+ function isInWhichSegment(pathElement, x, y) {
+ if (pathElement.tagName != "path") { return; }
+ console.log(pathElement.getBoundingClientRect() );
+ console.log("x:" + x + " y:" + y);
+   var seg;
+   var len = pathElement.getTotalLength();
+   // You get get the coordinates at the length of the path, so you
+   // check at all length point to see if it matches
+   // the coordinates of the click
+   for (var i = 0; i < len; i++) {
+     var pt = pathElement.getPointAtLength(i);
+     // you need to take into account the stroke width, hence the +- 2
+     if ((pt.x < (x + 5) && pt.x > (x - 5)) && (pt.y > (y - 5) && pt.y < (y + 5))) {
+       seg = pathElement.getPathSegAtLength(i);
+       break;
+     }
+   }
+   return seg;
+ }
 
 /* 
  * Functions that provide functionality to be called from the host script. This is not invoked from the drawing itself.
@@ -683,7 +726,8 @@ function addEditEventHandlers() {
 	for (var tag of tags) {
 		let elements = laserSvgRoot.getElementsByTagName(tag);
 		for (let element of elements) {
-			element.onclick = function () {
+			element.onclick = function (event) {
+				console.log('The index of the clicked segment is', isInWhichSegment(this, event.offsetX, event.offsetY));
 				// clear selection by removing the selected class from all other tags
 				for (let e of laserSvgRoot.querySelectorAll('.selected')) {
 					e.classList.remove("selected");

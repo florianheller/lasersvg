@@ -21,12 +21,13 @@
 			var newRect = [rectangle.getAttribute('x'), rectangle.getAttribute('y'), rectangle.getAttribute('width'), rectangle.getAttribute('height')];
 
 			var newPath = document.createElementNS(document.rootElement.namespaceURI,"path");  
+
 			newPath.setAttribute("id", rectangle.getAttribute('id') + '-laser');  
 			newPath.setAttribute("stroke", "#384C6C");  
 			newPath.setAttribute("stroke-width", 2);  
 			newPath.setAttribute("opacity", 1);  
 			newPath.setAttribute("fill", "none");
-
+			newPath.setAttributeNS('http://www.heller-web.net/lasersvg',"laser:test","test");
 			// Now the interesting part
 
 			// Move to the origin of the rectangle.
@@ -96,6 +97,7 @@
 
     	// If the embedding document supports it, make our functions available
 		if(window.parent.svgLoaded) window.parent.svgLoaded(this);
+		createFingerJoints();
 	]]>
 	</script>
 </svg>

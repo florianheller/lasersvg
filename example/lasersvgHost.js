@@ -221,8 +221,8 @@ function convertToThickness() {
 
 	// find the cursor position within the command
 	let diff = position - command.index;
-	console.log(command[0]);
-	console.log(diff);
+	console.log("Command " + command[0]);
+	console.log("Diff" + diff);
 
 	// Rebuilding the string is rather tricky
 
@@ -246,7 +246,7 @@ function convertToThickness() {
 		else if (number == 1) { snippet = " {thickness} "; }
 		else if (number == -1) { snippet = " -{thickness} "; } 
 		else { snippet = " {" + number + "*thickness} "; }
-		newCommand = command[0].substring(0,1) +" " + + numbers[0] + snippet ;
+		newCommand = command[0].substring(0,1) +" " + numbers[0] + snippet ;
 	}
 
 	let newDescription = descriptionDiv.innerText.substring(0, command.index) + newCommand + descriptionDiv.innerText.substring(command.index + command[0].length);

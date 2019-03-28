@@ -6,7 +6,7 @@ svg {
 }
 
 path, rect, circle {
-	stroke-width: 0.5px;
+	stroke-width: 1px;
 	stroke: #384C6C;
 	stroke-linecap: square;
 	fill: none;
