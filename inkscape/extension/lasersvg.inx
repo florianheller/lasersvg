@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+    <_name>LaserSVG Toolkit</_name>
+    <id>be.lennertdaniels.lasersvg</id>
+    <dependency type="executable" location="extensions">lasersvg.py</dependency>
+    <dependency type="executable" location="extensions">inkex.py</dependency>
+	<param name="tab" type="notebook">
+
+        <page name="Toolkit" _gui-text="Toolkit">
+            <_param name="help" type="description" xml:space="preserve">Tag the selected objects.</_param>
+ 
+            <param name="compatibility" type="optiongroup" _gui-text="Attribute:">
+                <_item value="thickness-adjust">thickness-adjust="width"</_item>
+                <_item value="thickness-adjust">thickness-adjust="heigth"</_item>
+                <_item value="kerf-adjust">kerf-adjust=""</_item>
+            </param>
+        </page>
+
+        <page name="Attributes" _gui-text="Attributes">
+
+            <_param name="help" type="description">Template attribute values</_param>
+            <param name="att" type="int" min="0" _gui-text="Material thickness (mm)">3</param>
+            <param name="att" type="float" min="0.0" _gui-text="Kerf">0.2</param>
+
+            <_param name="help" type="description"> </_param>
+
+       </page>
+        
+        <page name="Help" _gui-text="Help">
+            <_param name="intro" type="description">LaserSVG allows the user to tag edges that should measure the material thickness, and adjust the entire template at once based on the desired cutting material.</_param>
+            <_param name="desc1" type="description"></_param>
+        </page>
+    </param>
+    <effect>
+    <object-type>all</object-type>
+        <effects-menu>
+            <submenu _name="LaserSVG">
+                <submenu name="LaserSVG Toolkit"/>
+            </submenu>
+        </effects-menu>
+    </effect>
+    <script>
+        <command reldir="extensions" interpreter="python">lasersvg.py</command>
+    </script>
+</inkscape-extension>
