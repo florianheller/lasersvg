@@ -24,10 +24,10 @@
      <g id="benchSide" fill="#F5F6F8">
             <rect x="0" y="0" width="50" height="50"/>
             <g fill="#E1E4E9" stroke="#A9CE38" stroke-width="0.2">
-                <rect x="15" y="30" width="5" height="3" laser:thickness-adjust="height" laser:kerf-adjust="shrink" />
-                <rect x="25" y="30" width="5" height="3" laser:thickness-adjust="height" laser:kerf-adjust="shrink" />
-                <rect x="40" y="5" width="3" height="5"  laser:thickness-adjust="width" laser:kerf-adjust="shrink" />
-                <rect x="40" y="15" width="3" height="5" laser:thickness-adjust="width" laser:kerf-adjust="shrink" />
+                <rect x="15" y="30" width="5" height="3" laser:thickness-adjust="height" laser:origin="bottom" laser:kerf-adjust="shrink" />
+                <rect x="25" y="30" width="5" height="3" laser:thickness-adjust="height" laser:origin="bottom" laser:kerf-adjust="shrink" />
+                <rect x="40" y="5" width="3" height="5"  laser:thickness-adjust="width" laser:origin="right" laser:kerf-adjust="shrink" />
+                <rect x="40" y="15" width="3" height="5" laser:thickness-adjust="width" laser:origin="right" laser:kerf-adjust="shrink" />
             </g>
     </g> 
     <g id="benchSide2" fill="#F5F6F8">

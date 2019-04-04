@@ -10,7 +10,6 @@
  *	or http://github.io/florianheller/lasersvg for more info
  * 
  * 
- *	TODO: implement the scaling funtion
  *	
  *	TODO: implement the press-fit joint indicators
  *	laser:press-fit should work like the stroke-alignment attribute from SVG2
@@ -23,8 +22,6 @@
  *  TODO: only convert rects to paths when needed. 
  *	TODO: provide a list of joint types and their parameters as info-dictionaries
  *	TODO: Finish template generation for rects with specified material thickness attributes
- *	TODO: rename press-fit=[Inside|Outside] to kerf-adjust=[grow|shrink]
- *	TODO: allow user to flip direction when using flaps
  *	TODO: create template for parametric joints to be adaptable to material thickness afterwards
  *	TODO: get grip of holes of t-slot joints to be able to remove them if needed (possibly compound path with jumps)
  *	TODO: add handling for ellipses, polygons, and polylines (https://www.w3.org/TR/SVG2/shapes.html#EllipseElement)
@@ -57,14 +54,54 @@ var scalingFactor = 1.0;
 
 function updateThickness(newThickness) {
 
+	let oldThickness = Number(materialThickness);
+
 	//Update the global material Thickness
 	materialThickness = Number(newThickness);
 
-	var thickness = materialThickness;
+	//Make sure we have a number to run calculations on
+	let thickness = materialThickness;
+
 	// Iterate over all objects in the SVG
 	var elements = laserSvgRoot.querySelectorAll('*');
 
 	for (let element of elements) {
+			// If the origin is specified, 
+			if (element.hasAttributeNS(laser_NS,'origin')) {
+				// In that case, we also need to adjust the position of the element. 
+				// For that purpose we have two options: either we save the original position or we take the previous thickness value and calculate the difference. 
+				// The advantage of saving the original values is that errors don't add up if we work with float-thicknesses. 
+				var originX, originY;
+				if (!element.hasAttributeNS(laser_NS,'originX')) {
+					originX = Number(element.getAttribute('x')) + oldThickness;
+					element.setAttributeNS(laser_NS, 'laser:originX', originX );
+				}
+				else {
+					originX = Number(element.getAttributeNS(laser_NS,'originX'));
+				}
+				if (!element.hasAttributeNS(laser_NS,'originY')) {
+					originY = Number(element.getAttribute('y')) + oldThickness;
+					element.setAttributeNS(laser_NS, 'laser:originY', originY);
+				}
+				else {
+					originY = Number(element.getAttributeNS(laser_NS,'originY'));
+				}
+
+				var origin = element.getAttributeNS(laser_NS,'origin');
+				switch(origin) {
+					// case 'top': break; //Default
+					case 'bottom': element.setAttribute("y", originY - thickness); break;
+					// case 'left': break; //Default
+					case 'right': element.setAttribute("x", originX - thickness); break;
+					// case 'top-left': break; // Default
+					case 'top-right': break;
+					// case 'bottom-left': break; //Same as bottom
+					case 'bottom-right': element.setAttribute("y", originY - thickness);  element.setAttribute("x", originX + thickness); break;
+					case 'center':  element.setAttribute("y", (originalY - thickness)/2);  element.setAttribute("x", (originX + thickness)/2); break;
+				}
+
+			}
+
 		// Check if it has a material thickness attribute
 		if (element.hasAttributeNS(laser_NS,'thickness-adjust')) {
 			var setting = element.getAttributeNS(laser_NS,'thickness-adjust');
@@ -110,6 +147,16 @@ function scale(scalingFactor) {
 			}
 			if (element.hasAttribute("r")) {
 				element.setAttribute("r", Number(element.getAttribute("r"))*scalingFactor);
+			}
+			// Change the coordinates that might have been saved along with the 'origin' parameter
+			if (element.hasAttributeNS(laser_NS,"originX")) {
+				element.setAttributeNS(laser_NS, 'laser:originX', Number(element.getAttributeNS(laser_NS,"originX"))*scalingFactor);
+			}
+			if (element.hasAttributeNS(laser_NS,"originY")) {
+				element.setAttributeNS(laser_NS, 'laser:originY', Number(element.getAttributeNS(laser_NS,"originY"))*scalingFactor);
+			}
+			if (element.hasAttributeNS(laser_NS,"r")) {
+				element.setAttributeNS(laser_NS, 'laser:r', Number(element.getAttributeNS(laser_NS,"r"))*scalingFactor);
 			}
 			// Get potential adjustment setting
 			var setting = "";
