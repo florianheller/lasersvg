@@ -590,8 +590,12 @@ function createJoints() {
 	// TODO: replace all rects by 4 equivalent paths
 	// TODO: replace composed paths by equivalent 1-stop paths
 
-	// Look for paths that have a connection assigned
-	var paths = laserSvgRoot.querySelectorAll('[*|joint]');
+	// First transorm all primitives with joints assigned into path segments 
+	let elements = laserSvgRoot.querySelectorAll('[*|joint-left],[*|joint-top],[*|joint-bottom],[*|joint-right]');
+	elements.forEach((element) => { replacePrimitive(element); } );
+
+	// Now we can work on paths
+	let paths = laserSvgRoot.querySelectorAll('[*|joint]');	
 	for (let path of paths) {
 		// Get the direction of the joint
 		var direction = -1;
@@ -614,69 +618,61 @@ function createJoints() {
 	}
 }
 
-function replacePrimitives() {
-	// iterate over all rects and replace them with single paths
-	// TODO: make sure transforms are applied accordingly
-	let rects = laserSvgRoot.getElementsByTagName('rect');
+function replacePrimitive(rect) {
+	//Get the origin and dimensions of the rect
+	// let x = rect.x.baseVal.valueInSpecifiedUnits;
+	// let y = rect.y.baseVal.valueInSpecifiedUnits;
+	// let width = rect.width.baseVal.valueInSpecifiedUnits;
+	// let height = rect.height.baseVal.valueInSpecifiedUnits;
+	let x = rect.x.baseVal.value;
+	let y = rect.y.baseVal.value;
+	let width = rect.width.baseVal.value;
+	let height = rect.height.baseVal.value;
+
+	// Top
+	let pathTop = document.createElementNS("http://www.w3.org/2000/svg", "path");
+	var pathData = [
+		{ type: "M", values: [x  , y] },
+		{ type: "l", values: [width, 0] }
+	]; 
+	pathTop.setPathData(pathData);
+	transferAttributes(rect, pathTop, "top");
+	laserSvgRoot.appendChild(pathTop);	
+	pathTop.setAttributeNS(laser_NS,"laser:template",pathTop.getAttribute("d"));
+	// Right
+	let pathRight = document.createElementNS("http://www.w3.org/2000/svg", "path");
+	var pathData = [
+		{ type: "M", values: [x + width , y + height] },
+		{ type: "l", values: [0, -height] }
+	]; 
+	pathRight.setPathData(pathData);
+	transferAttributes(rect, pathRight, "right");
+	laserSvgRoot.appendChild(pathRight);	
+	pathRight.setAttributeNS(laser_NS,"template",pathRight.getAttribute("d"));
+	// Bottom
+	let pathBottom = document.createElementNS("http://www.w3.org/2000/svg", "path");
+	var pathData = [
+		{ type: "M", values: [x + width , y + height] },
+		{ type: "l", values: [-width, 0] }
+	]; 
+	pathBottom.setPathData(pathData);
+	transferAttributes(rect, pathBottom, "bottom");
+	laserSvgRoot.appendChild(pathBottom);
+	pathBottom.setAttributeNS(laser_NS,"laser:template",pathBottom.getAttribute("d"));
+	// Left
+	let pathLeft = document.createElementNS("http://www.w3.org/2000/svg", "path");
+	var pathData = [
+		{ type: "M", values: [x  , y ] },
+		{ type: "l", values: [0, height] }
+	]; 
+	pathLeft.setPathData(pathData);
+	transferAttributes(rect, pathLeft, "left");
+	laserSvgRoot.appendChild(pathLeft);
+	pathLeft.setAttributeNS(laser_NS,"laser:template",pathLeft.getAttribute("d"));
+
+	// Remove the original rect
+	rect.parentNode.removeChild(rect);
 	
-	while (rects[0]) { //rects is a NodeList and gets updated when we remove stuff
-
-		rect = rects[0];
-
-		//Get the origin and dimensions of the rect
-		// let x = rect.x.baseVal.valueInSpecifiedUnits;
-		// let y = rect.y.baseVal.valueInSpecifiedUnits;
-		// let width = rect.width.baseVal.valueInSpecifiedUnits;
-		// let height = rect.height.baseVal.valueInSpecifiedUnits;
-		let x = rect.x.baseVal.value;
-		let y = rect.y.baseVal.value;
-		let width = rect.width.baseVal.value;
-		let height = rect.height.baseVal.value;
-
-		// Top
-		let pathTop = document.createElementNS("http://www.w3.org/2000/svg", "path");
-		var pathData = [
-			{ type: "M", values: [x  , y] },
-			{ type: "l", values: [width, 0] }
-		]; 
-		pathTop.setPathData(pathData);
-		transferAttributes(rect, pathTop, "top");
-		laserSvgRoot.appendChild(pathTop);	
-		pathTop.setAttributeNS(laser_NS,"laser:template",pathTop.getAttribute("d"));
-		// Right
-		let pathRight = document.createElementNS("http://www.w3.org/2000/svg", "path");
-		var pathData = [
-			{ type: "M", values: [x + width , y + height] },
-			{ type: "l", values: [0, -height] }
-		]; 
-		pathRight.setPathData(pathData);
-		transferAttributes(rect, pathRight, "right");
-		laserSvgRoot.appendChild(pathRight);	
-		pathRight.setAttributeNS(laser_NS,"template",pathRight.getAttribute("d"));
-		// Bottom
-		let pathBottom = document.createElementNS("http://www.w3.org/2000/svg", "path");
-		var pathData = [
-			{ type: "M", values: [x + width , y + height] },
-			{ type: "l", values: [-width, 0] }
-		]; 
-		pathBottom.setPathData(pathData);
-		transferAttributes(rect, pathBottom, "bottom");
-		laserSvgRoot.appendChild(pathBottom);
-		pathBottom.setAttributeNS(laser_NS,"laser:template",pathBottom.getAttribute("d"));
-		// Left
-		let pathLeft = document.createElementNS("http://www.w3.org/2000/svg", "path");
-		var pathData = [
-			{ type: "M", values: [x  , y ] },
-			{ type: "l", values: [0, height] }
-		]; 
-		pathLeft.setPathData(pathData);
-		transferAttributes(rect, pathLeft, "left");
-		laserSvgRoot.appendChild(pathLeft);
-		pathLeft.setAttributeNS(laser_NS,"laser:template",pathLeft.getAttribute("d"));
-
-		// Remove the original rect
-		rect.parentNode.removeChild(rect);
-	}
 }
 
 // Transfers the joint-attributes from a rect to a path at the given orientation, 
@@ -717,10 +713,6 @@ function svgLoaded(event){
 		kerf = Number(laserSvgRoot.getAttributeNS(laser_NS,"kerf"));
 	}
 
-	// TODO: remove groups by applying their transforms to the child elements.
-	// TODO: how to work with defs? Do we need to replace them in the DOM?
-	// Replace Primitives with singles paths
-	replacePrimitives();
 	// Create the joints as specified by the parameters
 	createJoints();
 
