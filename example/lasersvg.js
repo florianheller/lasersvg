@@ -210,7 +210,7 @@ function useTemplateWithThickness(path, thickness) {
 		}
 		
 		return calc(thickness) });
-	console.log(newTemplate)
+
 	path.setAttribute("d",newTemplate);
 }
 
