@@ -664,10 +664,10 @@ function svgLoaded(event){
 	//laserSvgDocument = event.target.ownerDocument;	// A pointer to our own SVG document, to make sure we have the correct pointer even if we are embedded in another document
 	laserSvgRoot = laserSvgDocument.documentElement;	// The DOM-Root of our svg document.
 	if (laserSvgRoot.hasAttributeNS(laser_NS,"material-thickness")) {
-		materialThickness = laserSvgRoot.getAttributeNS(laser_NS,"material-thickness");
+		materialThickness = Number(laserSvgRoot.getAttributeNS(laser_NS,"material-thickness"));
 	}
 	if (laserSvgRoot.hasAttributeNS(laser_NS,"kerf")) {
-		kerf = laserSvgRoot.getAttributeNS(laser_NS,"kerf");
+		kerf = Number(laserSvgRoot.getAttributeNS(laser_NS,"kerf"));
 	}
 
 	// TODO: remove groups by applying their transforms to the child elements.
