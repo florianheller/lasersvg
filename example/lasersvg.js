@@ -816,13 +816,16 @@ function getImageForSaving() {
 
 function getImageForExport() {
 	// TODO: remove the lines vizualizing the connections
-	// TODO: remove the interactivity (onMouseOver etc.)
-
+	removeEditEventHandlers();
 	//Adjust for Kerf if required
 	adjustForKerf();
 
 	let serializer = new XMLSerializer();
-	return serializer.serializeToString(laserSvgRoot);
+	let document = serializer.serializeToString(laserSvgRoot);
+
+	addEditEventHandlers();
+
+	return document;
 }
 
 // If the file was not yet a LaserSVG File, then the onload statement is missing and the callback never gets called
