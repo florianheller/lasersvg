@@ -23,6 +23,7 @@ const svg_NS = 'http://www.w3.org/2000/svg';
 const xlink_NS = 'http://www.w3.org/1999/xlink';
 
 var laserSvgScript;
+var svgRootNode;
 
 var numberOfFingers = 5;
 
@@ -66,6 +67,7 @@ function updateDrawing(numberOfFingers) {
 
 function svgDidLoad(script) {
 	laserSvgScript = script;
+	svgRootNode = document.getElementById("drawingObject").contentDocument.firstElementChild;
 
 	let factorDisplay = document.getElementById('materialThickness');
   	factorDisplay.innerHTML = script.materialThickness;
