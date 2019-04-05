@@ -770,7 +770,8 @@ function addEditEventHandlers() {
 		let elements = laserSvgRoot.getElementsByTagName(tag);
 		for (let element of elements) {
 			element.onclick = function (event) {
-				console.log('The index of the clicked segment is', isInWhichSegment(this, event.offsetX, event.offsetY));
+				let segmentIndex = isInWhichSegment(this, event.offsetX, event.offsetY);
+				highlightPathSegment(this, segmentIndex, "pathTemplate");
 				// clear selection by removing the selected class from all other tags
 				for (let e of laserSvgRoot.querySelectorAll('.selected')) {
 					e.classList.remove("selected");
@@ -778,7 +779,7 @@ function addEditEventHandlers() {
 				}
 				currentSelection = this;
 				this.classList.add("selected");
-				parentDocument.didSelectElement(this); //Notify the host script
+				parentDocument.didSelectElement(this, segmentIndex); //Notify the host script
 			}
 		}
 	}
