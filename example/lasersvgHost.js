@@ -200,7 +200,7 @@ function getCommandAtIndex(str,index) {
 
 // http://jsfiddle.net/cpatik/3QAeC/
 //TODO: make this ignore multiple spaces, newlines in the path description
-function getPosition(element) {
+function getCaretPosition(element) {
 	let caretOffset = 0;
 	var range = window.getSelection().getRangeAt(0);
         var preCaretRange = range.cloneRange();
@@ -210,10 +210,30 @@ function getPosition(element) {
         return(caretOffset);
 }
 
+function setCaretPosition(elemId, caretPos) {
+    var elem = document.getElementById(elemId);
+
+    if(elem != null) {
+        if(elem.createTextRange) {
+            var range = elem.createTextRange();
+            range.move('character', caretPos);
+            range.select();
+        }
+        else {
+            if(elem.selectionStart) {
+                elem.focus();
+                elem.setSelectionRange(caretPos, caretPos);
+            }
+            else
+                elem.focus();
+        }
+    }
+}
+
 //Converts the numberical value below the cursor to a thickness-marker with the appropriate calculation
 function convertToThickness() {
 	let descriptionDiv = document.getElementById("pathTemplate");
-	let position = getPosition(descriptionDiv);
+	let position = getCaretPosition(descriptionDiv);
 	let command = getCommandAtIndex(descriptionDiv.innerText, position);
 
 	// We need the two numerical values in that command, the first letter is the command that can be ignored
@@ -257,7 +277,7 @@ function convertToThickness() {
 function updatePathSelection(event,id) {
 	//This is the path description. We need to separate it into its subelements and count where in the path the marked section is
 	if (id==0) {
-		var index = getPosition(event);
+		var index = getCaretPosition(event);
 		let commands = getCommands(event.innerText);
 		//let command = getCommandAtIndex(event.innerText, index)[0];
 		//We have all the commands, now find the one that is at the location that was clicked
