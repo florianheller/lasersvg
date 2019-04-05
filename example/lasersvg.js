@@ -730,9 +730,12 @@ function svgLoaded(event){
 }
 
  function isInWhichSegment(pathElement, x, y) {
- if (pathElement.tagName != "path") { return; }
- console.log(pathElement.getBoundingClientRect() );
- console.log("x:" + x + " y:" + y);
+ 	if (pathElement.tagName != "path") { return; }
+
+	let bBox = pathElement.getBBox()
+ 	x += bBox.x;
+ 	y += bBox.y;
+
    var seg;
    var len = pathElement.getTotalLength();
    // You get get the coordinates at the length of the path, so you
@@ -741,7 +744,7 @@ function svgLoaded(event){
    for (var i = 0; i < len; i++) {
      var pt = pathElement.getPointAtLength(i);
      // you need to take into account the stroke width, hence the +- 2
-     if ((pt.x < (x + 5) && pt.x > (x - 5)) && (pt.y > (y - 5) && pt.y < (y + 5))) {
+     if ((pt.x < (x + 2) && pt.x > (x - 2)) && (pt.y > (y - 2) && pt.y < (y + 2))) {
        seg = pathElement.getPathSegAtLength(i);
        break;
      }
