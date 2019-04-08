@@ -27,6 +27,8 @@ var svgRootNode;
 
 var numberOfFingers = 5;
 
+var taggerActive = false;
+
 const {SVGPathData, SVGPathDataTransformer, SVGPathDataEncoder, SVGPathDataParser} = svgpathdata;
 
 function updateThickness(materialThickness) {
@@ -233,18 +235,20 @@ function setCaretPosition(elemId, caretPos) {
 }
 
 //Converts the numberical value below the cursor to a thickness-marker with the appropriate calculation
-function convertToThickness() {
+function convertToThickness(position) {
 	let descriptionDiv = document.getElementById("pathTemplate");
-	let position = getCaretPosition(descriptionDiv);
+	if (position == undefined) {
+		position = getCaretPosition(descriptionDiv);
+	}
 	let command = getCommandAtIndex(descriptionDiv.innerText, position);
-
+	console.log(position)
 	// We need the two numerical values in that command, the first letter is the command that can be ignored
 	let numbers = command[0].substring(1).trim().split(' '); 
 
 	// find the cursor position within the command
 	let diff = position - command.index;
-	console.log("Command " + command[0]);
-	console.log("Diff" + diff);
+	//console.log("Command " + command[0]);
+	//console.log("Diff" + diff);
 
 	// Rebuilding the string is rather tricky
 
@@ -285,6 +289,7 @@ function updatePathSelection(event,id) {
 		//We have all the commands, now find the one that is at the location that was clicked
 		let resultIndex = 0;
 		for (let i=1; i<commands.length-1; i++) {
+			console.log(commands[i]);
 			if (commands[i].index <= index && index <= commands[i+1].index ) {
 				resultIndex = i;
 			}
@@ -459,15 +464,37 @@ function highlightMarkers(template) {
 	return template.replace(/[{](.*?thickness.*?)[}]/g, function (x) { return "<span class=\"marker\">" + x + "</span>" } );
 }
 
+function toggleTagTool() {
+	taggerActive = !taggerActive;
+	let svgRoot = document.getElementById("drawingObject").contentDocument;
+	if (taggerActive == true) {
+		svgRoot.firstElementChild.style.cursor = 'crosshair';
+	}
+	else {
+		svgRoot.firstElementChild.style.cursor = 'default';
+	}
+
+}
 
 // Delegate function for the selection of a path. 
-function didSelectElement(element) {
+function didSelectElement(element, subelement) {
+	loadParameters(element);
 	document.getElementById("parameters").classList.remove("hidden");
 	if (element.tagName == "path") {
 		document.getElementById("pathThickness").classList.remove("hidden");
 		document.getElementById("primitiveThickness").classList.add("hidden");
 		document.getElementById("kerfMaskEditing").classList.remove("hidden");
 		document.getElementById("kerfSelection").classList.add("hidden");
+
+		if (taggerActive == true) {
+			if (subelement !== undefined) {
+				//Set the cursor in the path editor to the position of the selected segment
+				let templateField = document.getElementById("pathTemplate");
+				let commands = getCommands(templateField.innerText);
+				convertToThickness(commands[subelement].index+2);
+			}
+		}
+
 	}
 	else {
 		document.getElementById("pathThickness").classList.add("hidden");
@@ -475,7 +502,7 @@ function didSelectElement(element) {
 		document.getElementById("kerfMaskEditing").classList.add("hidden");
 		document.getElementById("kerfSelection").classList.remove("hidden");
 	}
-	loadParameters(element);
+
 }
 
 function didSelectRectSide(side) {

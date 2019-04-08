@@ -38,6 +38,7 @@
           <div id="pathThickness">
             <p>Material Thickness: 
             <div id="pathTemplate" title="Replace the dimensions that are dependent on material thickness with {thickness}. Calculations such as {0.5*thickness} are possible." contenteditable onmouseup="updatePathSelection(this,0)" onkeyup="updatePathSelection(this,0)"></div>
+            <button type="button" id="tagToolToggle" onclick="toggleTagTool()">Tag</button>
             <button type="button" id="convertToThickness" onclick="convertToThickness()">Convert</button>
             <button type="button" id="pathTemplateSave" onclick="setPathTemplate()">Apply</button>
             </p>

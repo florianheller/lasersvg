@@ -309,7 +309,7 @@ function changePathSegmentLength(pathData, offset) {
  */
 function highlightPathSegment(path, segmentIndex, type) {
 	if (segmentIndex < 0) { return; } //Safety check
-	if (typeof path != "path") { return; }
+	if (path.tagName != "path") { return; }
 	let pathData = path.getPathData({normalize: true}); // Returns absolute coordinates
 
 	if (segmentIndex >= pathData.length) { return; } //Index out of bounds
