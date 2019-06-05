@@ -1,31 +1,55 @@
-@namespace laser 'http://www.heller-web.net/lasersvg';
+@namespace laser url('http://www.heller-web.net/lasersvg');
 @namespace xlink 'http://www.w3.org/1999/xlink';
 
 svg {
-	background-color: #F5F6F8;
+	background-color: none;
 }
 
-path, rect, circle {
-	stroke-width: 1px;
-	stroke: #384C6C;
+@media screen {
+	rect[laser|operation=cut] {
+		stroke: #0000FF;
+		stroke-width = 1.2;
+		fill: none;
+	}
+
+	.selected {
+	stroke: #324461;
+	stroke-width: 0.5px; 
+	outline: 1px solid #A9CE38;
+	}
+
+
+	.pathHighlight-pathTemplate {
+		stroke: magenta;
+	}
+
+	path, rect, circle {
+	stroke-width: 0.5px;
+	stroke: #000000;
+	stroke-linecap: square;
+	fill: none;
+}
+}
+
+
+@media print {
+
+	rect[laser|operation=cut] {
+		stroke: #0000FF;
+		stroke-width = 0.2;
+		fill: none;
+	}
+
+	@page {
+		size: auto;
+	}
+
+	path, rect, circle {
+	stroke-width: 0.1px;
+	stroke: #0000FF;
 	stroke-linecap: square;
 	fill: none;
 }
 
-.selected {
-	stroke: #324461;
-	stroke-width: 0.5px; 
-	outline: 1px solid #A9CE38;
 }
-
-.pathHighlight-pathTemplate {
-	stroke: magenta;
-}
-
-[laser|joint] {
-	stroke: #A9CE38;
-	//stroke-dasharray: 5,10,5;
-	//fill: none;
-}
-
 
