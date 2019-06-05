@@ -777,7 +777,7 @@ function svgLoaded(event){
 	//laserSvgScript = event;	// A pointer to this very script in order to allow an embedding document to call functions on this script
 	//laserSvgDocument = event.target.ownerDocument;	// A pointer to our own SVG document, to make sure we have the correct pointer even if we are embedded in another document
 	laserSvgRoot = laserSvgDocument.documentElement;	// The DOM-Root of our svg document.
-	if (laserSvgRoot.hasAttributeNS(laser_NS,"material-thickness")) {
+	if ((!checkURLParameters()) && laserSvgRoot.hasAttributeNS(laser_NS,"material-thickness")) {
 		materialThickness = Number(laserSvgRoot.getAttributeNS(laser_NS,"material-thickness"));
 	}
 	if (laserSvgRoot.hasAttributeNS(laser_NS,"kerf")) {
@@ -797,6 +797,20 @@ function svgLoaded(event){
 		window.parent.svgDidLoad(this);
 	}
 
+}
+
+// This function checks wether parameters have been specified through the URL and will adjust the template accordingly;
+function checkURLParameters() {
+	var url = new URL(window.location.href);
+	var urlThickness = url.searchParams.get("thickness");
+	if (urlThickness != null) {
+		materialThickness = Number(urlThickness)
+		updateThickness(materialThickness)
+		return true
+	}
+	else { 
+		return false
+	}
 }
 
  function isInWhichSegment(pathElement, x, y) {
