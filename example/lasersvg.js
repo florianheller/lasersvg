@@ -412,6 +412,75 @@ function createFingerJointPath(path, gap, inset, fingers) {
 }
 
 
+function createCompactFingerJointPath(path, gap, inset, fingers) {
+	var pathData = path.getPathData({normalize: true});
+
+	if (pathData.length < 2) {
+		return;
+	}
+	// Working with pathData.length allows us to replace entire paths that, e.g., already contain a finger-joint pattern.
+	let width = pathData[pathData.length-1].values[0] - pathData[0].values[0];
+	let height = pathData[pathData.length-1].values[1] - pathData[0].values[1];
+	let alpha = Math.atan2(height, width);
+	let cos = Math.cos(alpha);
+	let sin = Math.sin(alpha);
+
+	// Calculate the length of the fingers and gaps
+	var edgeLength = Math.sqrt(height * height + width * width);
+
+	// Subtract the gaps on each side
+	edgeLength -=  2 * gap; 
+
+	//This length has to be divided into /fingers/ fingers and fingers-1 gaps
+	let fingerSize = edgeLength / (2 * fingers - 1);
+
+	//The first element of the first path segment list, as this determines the origin
+	// 
+	var newPathData = []; 
+	var newTemplate = [];
+	newPathData.push(pathData[0]);
+ 	newTemplate.push(pathData[0]);
+
+ 	newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
+ 	newTemplate.push({type: "l", values: [(cos * gap), (sin * gap)]});
+
+	//We are now at the point to add the first finger
+	for (var i = 0; i < fingers; i += 1) {
+ 		newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * inset), (Math.sin(alpha+(Math.PI/2)) * inset)]});
+ 		
+ 		newTemplate.push({type: "l", values: ["{(" + (Math.cos(alpha+(Math.PI/2)) * inset/(2*materialThickness) + "*thickness)-0.5}"), "{(" + (Math.sin(alpha+(Math.PI/2)) * inset/(2*materialThickness) + "*thickness)-0.5}")]});
+ 		newTemplate.push({type: "a", values: [kerf, kerf, 0, 1, 0, (Math.cos(alpha+(Math.PI/2)))*0.5 , (Math.sin(alpha+(Math.PI/2)))*0.5 ]});
+		newTemplate.push({type: "l", values: ["{(" + (Math.cos(alpha+(Math.PI/2)) * inset/(2*materialThickness) + "*thickness)-0.5}"), "{(" + (Math.sin(alpha+(Math.PI/2)) * inset/(2*materialThickness) + "*thickness)-0.5}")]});
+
+ 		newPathData.push({type: "l", values: [(cos * fingerSize), (sin * fingerSize)]});
+ 		newTemplate.push({type: "l", values: [(cos * fingerSize), (sin * fingerSize)]});
+
+ 		newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * inset), (Math.sin(alpha-(Math.PI/2)) * inset)]});
+ 		newTemplate.push({type: "l", values: ["{" +(Math.cos(alpha-(Math.PI/2))* inset/materialThickness + "*thickness}"), "{" + (Math.sin(alpha-(Math.PI/2)) * inset/materialThickness + "*thickness}")]});
+
+		if (i != fingers-1) {
+			newPathData.push({type: "l", values: [cos * fingerSize, sin * fingerSize]});
+			newTemplate.push({type: "l", values: [cos * fingerSize, sin * fingerSize]});
+		}
+	}
+
+	// Close the second gap
+	newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
+	newTemplate.push({type: "l", values: [(cos * gap), (sin * gap)]});
+
+
+	path.setPathData(newPathData);
+
+	//We need to convert the pathSegment list into a string that we can store as template
+	let tempPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+	tempPath.setPathData(newTemplate);
+	let tempTemplate = tempPath.getAttribute("d")
+
+	path.setAttributeNS(laser_NS, "laser:template", tempPath.getAttribute("d"));
+
+	updateThickness(materialThickness);
+}
+
 function createFlapJointPath(path, gap, inset, flaps) {
 	var pathData = path.getPathData({normalize: true});
 
@@ -609,6 +678,7 @@ function createJoints() {
 		if (path.hasAttributeNS(laser_NS,'joint-type')) {
 			switch(path.getAttributeNS(laser_NS,'joint-type')) {
 				case 'finger': createFingerJointPath(path, 5, materialThickness * direction, numberOfFingers); break;
+				case 'finger-compact': createCompactFingerJointPath(path, 5, materialThickness * direction, numberOfFingers); break;
 				case 'flap': createFlapJointPath(path, 5, materialThickness, 2); break;
 				case 'tslot': createTSlotPath(path, 5, materialThickness * direction, numberOfFingers); break;
 				default: break;
