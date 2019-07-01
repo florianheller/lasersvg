@@ -33,8 +33,8 @@ const {SVGPathData, SVGPathDataTransformer, SVGPathDataEncoder, SVGPathDataParse
 
 function updateThickness(materialThickness) {
 	// Show the materialThickness 
-	let factorDisplay = document.getElementById('materialThickness');
-  	factorDisplay.innerHTML = materialThickness;
+	let thicknessDisplay = document.getElementById('materialThickness');
+  	thicknessDisplay.innerHTML = materialThickness;
 	
 	//Scale the objects
 	laserSvgScript.updateThickness(materialThickness);
@@ -53,6 +53,14 @@ function updateScaling(scalingFactor) {
 }
 
 
+function highlightSegments() {
+	console.log(svgRootNode);
+	//Remove all previous highlights
+	for (let e of svgRootNode.querySelectorAll(".lengthHighlight")) {
+		e.parentNode.removeChild(e);
+	}
+	laserSvgScript.highlightElementsWithLength(laserSvgScript.materialThickness)
+}
 
 
 
@@ -99,24 +107,32 @@ function openFile(files) {
 
 function checkLaserSVGFeatures(origin, node) {
 	var svgNode = node.getElementsByTagName('svg')[0];
+
+	// We need the xlink namespace to add JS-File references. 
+	if (svgNode && svgNode.getAttribute("xmlns:xlink") == null) {	
+	  	svgNode.setAttributeNS("http://www.w3.org/2000/xmlns/","xmlns:xlink","http://www.w3.org/1999/xlink");
+	}
+
+	// Add the LaserSVG Stuff is needed
     if (svgNode && svgNode.getAttribute("xmlns:laser") == null) {
 	  	console.log("Not a lasersvg file, adding elements");
 	  	svgNode.setAttributeNS("http://www.w3.org/2000/xmlns/","xmlns:laser",laser_NS);
-	  	svgNode.setAttribute("onload", "svgLoaded(event)");
-	  	
-	  	// That doesn't work as the script is still loaded. 
+
+
 	  	let script = document.createElementNS(svg_NS, "script");
+		script.src = "http://www2.heller-web.net/LaserSVG2/lasersvg.js";
 	  	script.setAttribute("type","text/javascript");
 	  	script.setAttributeNS(xlink_NS, "xlink:href","http://www2.heller-web.net/LaserSVG2/lasersvg.js");
 		svgNode.appendChild(script);
+
 		let script2 = document.createElementNS(svg_NS, "script");
 	  	script2.setAttribute("type","text/javascript");
 		script2.setAttributeNS(xlink_NS, "xlink:href","http://www2.heller-web.net/LaserSVG2/path-data-polyfill.js");
 		svgNode.appendChild(script2);
 
-		var style = document.createElementNS(svg_NS, "style");
-		style.textContent = '@import url("http://www2.heller-web.net/LaserSVG2/lasersvg.css");';
-		svgNode.insertBefore(style, svgNode.firstChild);
+		//var style = document.createElementNS(svg_NS, "style");
+		//style.textContent = '@import url("http://www2.heller-web.net/LaserSVG2/lasersvg.css");';
+		//svgNode.insertBefore(style, svgNode.firstChild);
 
 	}
 }
