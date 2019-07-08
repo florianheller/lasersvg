@@ -2,42 +2,114 @@
 @namespace xlink 'http://www.w3.org/1999/xlink';
 
 svg {
-	background-color: none;
+	stroke: #000;
+	fill: none;
 }
 
 @media screen {
-	rect[laser|operation=cut] {
+
+	/* Everything that should be cut is colored blue (as used by the trotec driver)*/
+	[laser|action=cut] {
 		stroke: #0000FF;
-		stroke-width = 1.2;
+		stroke-width: 0.5;
 		fill: none;
 	}
 
+	[laser|action=engrave] {
+		stroke: #000;
+		stroke-width:0.1;
+		fill: #000;
+	}
+
+	/* To increase visibility, we will use a thicker stroke when shown on the display than in the export*/
+	rect[laser|action=cut] {
+		stroke-width: 0.5;
+		fill: none;
+	}
+
+	rect[laser|action=engrave] {
+		stroke-width: 1.0;
+		fill: #000;
+	}
+
 	.selected {
-	stroke: #324461;
-	stroke-width: 0.5px; 
-	outline: 1px solid #A9CE38;
+		stroke: #324461;
+		stroke-width: 0.5px; 
+		outline: 0.1pt dashed magenta;
 	}
 
 
 	.pathHighlight-pathTemplate {
-		stroke: magenta;
+		stroke: #A9CE38;
+	}
+	.pathHighlight-kerfTemplate {
+		stroke: #CC13A4;
+	}	
+	.lengthHighlight {
+		stroke: #0F0;
 	}
 
+/*
 	path, rect, circle {
 	stroke-width: 0.5px;
-	stroke: #000000;
 	stroke-linecap: square;
 	fill: none;
+	}
+
+	svg {
+
+	}
+
+*/
+	#editMenu button {
+		padding:0.1mm;
+		font-size: 1mm;	
+		margin: 1px;
+		font-family: "Menlo";
+
+	}
+
+	#editMenu {
+		/* outline: 1px solid #A9CE38; */
+		visibility: visible;
+		transform: translateY(-20px);
+		padding: 0px;
+		margin: 0px;
+	}
+
+	#editMenu > button:not(:first-child) {
+		opacity: 0;
+		transition: 1s
+	}
+
+	#editMenu rect {
+		stroke: #384C6C;
+		fill: #E1E4E9;
+	}
+
 }
-}
+
+/*
+ ********** Settings relevant for the print-export ************ 
+ * Here, we apply settings to the elements based on the action specified in the svg. 
+ * Epliog uses line-tickness to determine what to cut, whereas Trotec uses color
+ * 
+ */
 
 
 @media print {
 
-	rect[laser|operation=cut] {
-		stroke: #0000FF;
+
+	[laser|action=cut] {
+		stroke: #00F;
 		stroke-width = 0.2;
 		fill: none;
+	}
+
+	[laser|action=engrave] {
+		stroke: #FF0000;
+		stroke-width = 0.2;
+		fill: #000;
 	}
 
 	@page {
@@ -49,7 +121,24 @@ svg {
 	stroke: #0000FF;
 	stroke-linecap: square;
 	fill: none;
-}
+	}
+
+	/* the menu should not be visible in the export */
+
+	#editMenu {
+		visibility: hidden;
+	}
 
 }
+
+/*
+ ********** Animation Stuff for the menu ************ 
+ */
+
+@keyframes show {
+  0% { opacity: 0; }
+  10% { opacity: 0; }
+  15% { opacity: 1; }
+  100% { opacity: 1; }
+} 
 
