@@ -346,48 +346,7 @@ function isInWhichSegment(pathElement, x, y) {
 
 
 
-/* 
- * Functions that provide functionality to be called from the host script. This is not invoked from the drawing itself.
- */
 
-var currentSelection;
-
-function setPropertyForSelection(property, value) {
-	console.log("Set Property " + property + " to " + value + " on " + currentSelection + " in namespace " + laser_NS);
-	currentSelection.setAttributeNS(laser_NS, "laser:" + property, value);
-	console.log(currentSelection.outerHTML);
-}
-
-function addEditEventHandlers() {
-	let tags = ['path', 'rect', 'circle'];
-	for (var tag of tags) {
-		let elements = laserSvgRoot.getElementsByTagName(tag);
-		for (let element of elements) {
-			element.onclick = function (event) {
-				let segmentIndex = isInWhichSegment(this, event.offsetX, event.offsetY);
-				highlightPathSegment(this, segmentIndex, "pathTemplate");
-				// clear selection by removing the selected class from all other tags
-				for (let e of laserSvgRoot.querySelectorAll('.selected')) {
-					e.classList.remove("selected");
-					if (e.getAttribute("class") == "" ) { e.removeAttribute("class"); } // Leave a clean DOM
-				}
-				currentSelection = this;
-				this.classList.add("selected");
-				parentDocument.didSelectElement(this, segmentIndex); //Notify the host script
-			}
-		}
-	}
-}
-
-function removeEditEventHandlers() {
-	let tags = ['path', 'rect'];
-	for (var tag of tags) {
-		let elements = laserSvgRoot.getElementsByTagName(tag);
-		for (var element of elements) {
-			element.onclick = null;
-		}
-	}
-}
 
 
 function redrawSelection() {
@@ -399,27 +358,29 @@ function redrawSelection() {
 	}
 }
 
-
+// Save a LaserSVG File
 function getImageForSaving() {
+	removeEditUtilities();
+
 	let serializer = new XMLSerializer();
 	return serializer.serializeToString(laserSvgRoot);
 }
 
+//Export an SVG file 
 function getImageForExport() {
 	// TODO: remove the lines vizualizing the connections
-	removeEditEventHandlers();
+	removeEditUtilities();
 	//Adjust for Kerf if required
 	adjustForKerf();
 
 	laserSvgRoot = laserSvgDocument.documentElement;	// The DOM-Root of our svg document.
-	laserSvgRoot.setAttributeNS(laser_NS, "material-thickness", materialThickness);
-	laserSvgRoot.setAttributeNS(laser_NS, "kerf", kerf);
+	laserSvgRoot.setAttributeNS(laser_NS, "laser:material-thickness", materialThickness);
+	laserSvgRoot.setAttributeNS(laser_NS, "laser:kerf", kerf);
 	
 	let serializer = new XMLSerializer();
 	let document = serializer.serializeToString(laserSvgRoot);
 
-	addEditEventHandlers();
-
+	
 	return document;
 }
 
@@ -467,13 +428,13 @@ function svgLoaded(event) {
 	createJoints();
 
 	// TODO: draw the lines visualizing the connections.
-	// Add the event handlers for editing
-	//addEditEventHandlers();
-
+	
 	// If the embedding document supports it, make our functions available
 	if(window.parent.svgDidLoad) { 
 		parentDocument = window.parent; //We need this pointer in edit mode
 		window.parent.svgDidLoad(this);
+		// Add the event handlers for editing
+		addEditEventHandlers();
 	}
 	else {
 		addMiniEditMenu();
