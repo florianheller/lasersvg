@@ -325,19 +325,38 @@ function changePathSegmentLength(pathData, offset) {
 function isInWhichSegment(pathElement, x, y) {
  	if (pathElement.tagName != "path") { return; }
 
-	let bBox = pathElement.getBBox()
- 	x += bBox.x;
+
+ 	// The problem is that (except for firefox, the click coordinates are returned in pixels, not in svg coordinate space)
+ 	// So we first need to determine the scaling factor for x an y
+ 	// And make the coordinates relative to the bounding box
+	let bBox = pathElement.getBBox();
+	let pixelBBox = pathElement.getBoundingClientRect();
+
+	x -= pixelBBox.x;
+	y -= pixelBBox.y;
+
+	let scaleX = pixelBBox.width / bBox.width;
+	let scaleY = pixelBBox.height / bBox.height;
+
+ 	x /= scaleX;
+ 	y /= scaleY;
+
+	// And since pointAtLength() includes the coordinates from the first move-command, add it back to the click coordinates
+	x += bBox.x;
  	y += bBox.y;
 
-   var seg;
+	
+   var seg = -1;
    var len = pathElement.getTotalLength();
    // You get get the coordinates at the length of the path, so you
    // check at all length point to see if it matches
    // the coordinates of the click
+   let tolerance = 2;
    for (var i = 0; i < len; i++) {
      var pt = pathElement.getPointAtLength(i);
      // you need to take into account the stroke width, hence the +- 2
-     if ((pt.x < (x + 2) && pt.x > (x - 2)) && (pt.y > (y - 2) && pt.y < (y + 2))) {
+     //if ((pt.x < (x + tolerance) && pt.x > (x - tolerance)) && (pt.y > (y - tolerance) && pt.y < (y + tolerance))) {
+     if ((x < (pt.x + tolerance) && x > (pt.x - tolerance)) && (y > (pt.y - tolerance) && y < (pt.y + tolerance))) {
        seg = pathElement.getPathSegAtLength(i);
        break;
      }
