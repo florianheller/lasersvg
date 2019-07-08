@@ -17,31 +17,30 @@ function showItem(item) {
 
 }
 
- function showMenu() {
- 	menuItems.map(showItem);
- }
+function showMenu() {
+ 	menuItems.map(toggleItem);
+}
 
- function setThicknessClicked() {
+function setThicknessClicked() {
  	var newThickness = prompt("Please enter the new material thickness:", materialThickness);
   	if (newThickness != null && newThickness != "") {
     	updateThickness(newThickness)
   	} 
- }
+}
 
- function setKerfClicked() {
+function setKerfClicked() {
  	var newKerf = prompt("Please enter the new kerf value:", kerf);
   	if (newKerf != null && newKerf != "") {
   		kerf = newKerf;
   		adjustForKerf()
   	} 
- }
+}
 
- function setScaleClicked() {
+function setScaleClicked() {
  	var newScale = prompt("Please enter the new scaling factor:", scalingFactor * 100);
   	if (newScale != null && newScale != "") {
   		scale(Number(newScale)/100)
   	}
- }
 
 
  function createButton(x, y, width, height, title, parent, fontSize, rx, ry, labelXOffset, labelYOffset) {
