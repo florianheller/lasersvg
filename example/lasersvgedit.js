@@ -103,7 +103,7 @@ function createMenuButton(item, index, array) {
  * @param type: if multiple selections can occur, specifiy a different type for every selection. This reflects in the CSS selectors .pathHilight-type
  */
 function highlightPathSegment(path, segmentIndex, type) {
-	if (segmentIndex < 0) { return; } //Safety check
+	if (segmentIndex < 1) { return; } //Safety check
 	if (path.tagName != "path") { return; }
 	let pathData = path.getPathData({normalize: true}); // Returns absolute coordinates
 
@@ -141,7 +141,7 @@ function highlightSegmentsWithLengthInPath(path, length) {
 			// Create a highlight path
 			let highlight = createHighlightWithCoordinates(start[0], start[1], end[0], end[1]);
 			highlight.setAttribute("id","hl-"+path.id+"-"+i);
-			highlight.onlick = function() { onLengthHighlightClicked(path.id,i) }
+			highlight.onclick = function(event) { onLengthHighlightClicked(this, path.id, i, null) }
 			laserSvgRoot.appendChild(highlight);
 		}
 	}
@@ -200,13 +200,12 @@ function highlightElementsWithLength(length) {
 				let highlight1 = createHighlightWithCoordinates(x, y, x+length, y)
 				highlight1.id = "hl-"+element.id+"-0"
 				laserSvgRoot.appendChild(highlight1);
-				highlight1.onclick = function() { onLengthHighlightClicked(element.id, "width") }
+				highlight1.onclick = function(event) { onLengthHighlightClicked(this, element.id, "width", highlight2) }
 
 				let highlight2 = createHighlightWithCoordinates(x, y+height, x+length, y+height)
 				highlight2.id = "hl-"+element.id+"-1"
 				laserSvgRoot.appendChild(highlight2);
-				highlight2.onclick = function() { onLengthHighlightClicked(element.id, "width") }
-
+				highlight2.onclick = function(event) { onLengthHighlightClicked(this, element.id, "width", highlight1) }
 			}
 		}
 		if (element.hasAttribute("height")) {
@@ -220,14 +219,14 @@ function highlightElementsWithLength(length) {
 					element.id = element.tagName + Array.prototype.indexOf.call(elements, element);
 				}
 				let highlight1 = createHighlightWithCoordinates(x, y, x, y+length);
-				highlight1.id = "hl"+element.id+"0"
+				highlight1.id = "hl-"+element.id+"-0"
 				laserSvgRoot.appendChild(highlight1);
-				highlight1.onclick = function() { onLengthHighlightClicked(element.id, "height") }
+				highlight1.onclick = function(event) { onLengthHighlightClicked(this, element.id, "height", highlight2) }
 
 				let highlight2 = createHighlightWithCoordinates(x+width, y, x+width, y+length);
 				highlight2.id = "hl-"+element.id+"-1"
 				laserSvgRoot.appendChild(highlight2);
-				highlight2.onclick = function() { onLengthHighlightClicked(element.id, "height") }
+				highlight2.onclick = function(event) { onLengthHighlightClicked(this, element.id, "height", highlight1) }
 			}
 		}
 		// Circles and ellipses
@@ -249,16 +248,21 @@ function highlightElementsWithLength(length) {
  * @param elementID: the element to which the highlight belongs
  * @param info: either "width, "height", or the index of the path segment that was higlighted. 
  */
-function onLengthHighlightClicked(elementID, info) {
+function onLengthHighlightClicked(event, elementID, info, otherHighlight) {
 	let element = laserSvgRoot.getElementById(elementID);
 
 	if (element == null) return;
-
+	currentSelection = element; //Set the pointer to the object that belongs to these highlights.
 	switch(element.tagName) {
 		case "rect":
-			element.setAttributeNS(laser_NS, "thickness-adjust", info)
+			element.setAttributeNS(laser_NS, "laser:thickness-adjust", info)
+			event.parentNode.removeChild(event);
+			if (otherHighlight) { otherHighlight.parentNode.removeChild(otherHighlight); }
 			break;
-		case "path": break; 
+		case "path": 
+			parentDocument.convertSubelementToThickness(element, info);
+			event.parentNode.removeChild(event);
+			break; 
 	}
 	
 }
