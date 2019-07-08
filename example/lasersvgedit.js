@@ -10,11 +10,10 @@
  */
 
 
-
-function showItem(item) {
-	laserSvgRoot.getElementById(item+"Button").style.opacity = 1;
 var menuItems = ["thickness", "kerf", "scale"]
 
+function toggleItem(item) {
+	laserSvgRoot.getElementById(item+"Button").style.opacity = (laserSvgRoot.getElementById(item+"Button").style.opacity == 1) ? 0 : 1;
 }
 
 function showMenu() {
@@ -41,6 +40,7 @@ function setScaleClicked() {
   	if (newScale != null && newScale != "") {
   		scale(Number(newScale)/100)
   	}
+}
 
 
  function createButton(x, y, width, height, title, parent, fontSize, rx, ry, labelXOffset, labelYOffset) {
