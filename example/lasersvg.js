@@ -44,6 +44,7 @@ var kerf = 0.2;
 // Global scaling factor
 var scalingFactor = 1.0;
 
+var laserIsLoaded = false;
 
 /************************* Thickness, Scale, and Kerf ****************************************************/
 
@@ -440,6 +441,7 @@ function svgLoaded(event) {
 		addMiniEditMenu();
 	}
 
+	laserIsLoaded = true;
 }
 
 // This function checks wether parameters have been specified through the URL and will adjust the template accordingly;
