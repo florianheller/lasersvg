@@ -433,12 +433,13 @@ function getImageForExport() {
 
 // This function gets called by the JavaScript embedded into the SVG file. 
 // Setting the variable allows us to access the embedded JS to update parameters.
-function svgLoaded(event){
+function svgLoaded(event) {
 	console.log("SVG Loaded");
-
 	// check wether this has been called already
 	// this can happen when the SVG-File has some part of the LaserSVG components set
 	// and gets loaded into the editor. 
+	if (laserIsLoaded == true) return;
+		console.log("Laser SVG Loaded");
 
 	// Setting up pointers to the document root itself.
 	laserSvgDocument = event; 
