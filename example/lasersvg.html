@@ -27,10 +27,17 @@
         Zoom: <span id="scalingFactor">1</span> 
         <button type="button" id="zoomOut">-</button>  <button type="button" id="zoomIn">+</button> 
         <br>
-        <div> <label for="materialSlider">Material Thickness:</label>
-        <input type="range" min="0.5" max="10" step="0.5" value="3.5" class="slider" id="materialSlider">
-        <span id="materialThickness">3.5</span> mm
-      </div>
+        <div> 
+          <label for="materialSlider">Material Thickness:</label>
+          <input type="range" min="0.5" max="10" step="0.5" value="3.5" class="slider" id="materialSlider">
+          <span id="materialThickness">3.5</span> mm
+        </div>
+        Action: 
+        <select id="actionSelection" onchange="actionSelectionDidChange(this)">
+          <option value=""></option>
+          <option value="cut">cut</option>
+          <option value="engrave">engrave</option>
+        </select> 
       </div>
       <div>
         <h3>Edit</h3>

@@ -62,6 +62,15 @@ function highlightSegments() {
 	laserSvgScript.highlightElementsWithLength(laserSvgScript.materialThickness)
 }
 
+function actionSelectionDidChange(event) {
+	if (event.value == "") {
+		svgRootNode.removeAttributeNS(laser_NS, "action");
+	}
+	else {
+		svgRootNode.setAttributeNS(laser_NS, "laser:action", event.value)
+	}
+
+}
 
 
 // Callback to redraw after variables have been changed from the outside
@@ -84,6 +93,10 @@ function svgDidLoad(script) {
 
   	let slider = document.getElementById('materialSlider');
   	slider.value = script.materialThickness;
+
+  	if (svgRootNode.hasAttributeNS(laser_NS,"action")) {
+  		document.getElementById("actionSelection").value = svgRootNode.getAttributeNS(laser_NS, "action");
+  	}
 }
 
 function openFile(files) {
