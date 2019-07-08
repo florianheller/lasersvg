@@ -10,10 +10,10 @@
  */
 
 
-var menuItems = ["thickness", "kerf", "scale", "joints"]
 
 function showItem(item) {
 	laserSvgRoot.getElementById(item+"Button").style.opacity = 1;
+var menuItems = ["thickness", "kerf", "scale"]
 
 }
 
