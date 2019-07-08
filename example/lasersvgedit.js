@@ -43,90 +43,55 @@ function setScaleClicked() {
 }
 
 
- function createButton(x, y, width, height, title, parent, fontSize, rx, ry, labelXOffset, labelYOffset) {
-	
-	let buttonGroup = document.createElementNS(svg_NS, "g");
+function createMenuButton(item, index, array) {
 
-	let buttonRect = document.createElementNS(svg_NS, "rect");
- 	buttonRect.setAttribute("x",x);
- 	buttonRect.setAttribute("y",y);
- 	buttonRect.setAttribute("width",width);
- 	buttonRect.setAttribute("height",height);
- 	buttonRect.setAttribute("rx",2);
- 	buttonRect.setAttribute("ry",2);
- 	buttonRect.setAttributeNS(laser_NS,"resizeLock","lock");
+ 	let button = document.createElementNS("http://www.w3.org/1999/xhtml", "button");
+ 	button.innerHTML = item.title;
 
- 	let buttonText = document.createElementNS(svg_NS, "text");
- 	buttonText.textContent = title;
- 	buttonText.setAttribute("font-family","Menlo")
- 	buttonText.setAttribute("font-size",fontSize)
+ 	button.setAttribute("id",item.id+"Button");
+ 	button.setAttribute("onclick",item.onclick);
+ 	this.appendChild(button);
 
- 	buttonGroup.appendChild(buttonRect);
- 	buttonGroup.appendChild(buttonText);
-
-	parent.appendChild(buttonGroup);
-
-	// Align text centered
-
-	textBBox = buttonText.getBBox();
-
-	buttonText.setAttribute("x",x+((width-textBBox.width)/2));
-	// FontSize is 5
- 	buttonText.setAttribute("y",labelYOffset); 
-
- 	return buttonGroup;
-
- }
-
- function createMenuButton(item) {
- 	let buttonGroup = createButton(item.x, item.y, item.width, item.height, item.title, this, item.fontSize, 2, 2, item.textXOffset, item.textYOffset);
-
- 	buttonGroup.setAttribute("id",item.id+"Button");
- 	buttonGroup.setAttribute("onclick",item.onclick);
-
- } 
+} 
 /*
  *********** Add the miniEditor to the SVG-DOM-Tree ************
 
- <g id="editMenu" >
-        <g id="editButton" onclick="showMenu()"> 
-            <rect x="0" y="0" width="10" height="10" rx="2" ry="2" laser:resizeLock="lock" />
-            <text x="2" y="8" font-family="Menlo" font-size="10">⚙︎</text>
-        </g>
-        <g id="thicknessButton" onclick="setThicknessClicked()"> 
-            <rect x="12" y="0" width="30" height="10" rx="2" ry="2" laser:resizeLock="lock" />
-            <text x="13" y="7" font-family="Menlo" font-size="5">Thickness</text>
-        </g>
-        <g id="kerfButton" onclick="setKerfClicked()">
-            <rect x="44" y="0" width="30" height="10" rx="2" ry="2" laser:resizeLock="lock" />
-            <text x="52" y="7" font-family="Menlo" font-size="5">Kerf</text>
-        </g>
-        <g id="scaleButton" onclick="setScaleClicked()">
-            <rect x="76" y="0" width="30" height="10" rx="2" ry="2" laser:resizeLock="lock" />
-            <text x="83" y="7" font-family="Menlo" font-size="5">Scale</text>
-        </g>
-    </g>
+ 	<foreignObject width="270" height="20" id="editMenu" >
+        <button type="button" id="edit" xmlns="http://www.w3.org/1999/xhtml" onclick="showMenu()">⚙︎</button>
+        <button type="button" id="thickness" xmlns="http://www.w3.org/1999/xhtml" onclick="setThicknessClicked()">Thickness</button>
+        <button type="button" id="kerf" xmlns="http://www.w3.org/1999/xhtml" onclick="setKerfClicked()">Kerf</button>
+        <button type="button" id="scale" xmlns="http://www.w3.org/1999/xhtml" onclick="setScaleClicked()">Scale</button>
+        <button type="button" id="joints" xmlns="http://www.w3.org/1999/xhtml" onclick="setJointsClicked()">Joint</button>
+   	</foreignObject>
  */ 
  function addMiniEditMenu() {
  	let buttons = [	{ id:"edit", title:"⚙︎", x:0, y:0, width:10, height:10, textXOffset:2, textYOffset:8, onclick:"showMenu()", fontSize:10},
  					{ id:"thickness", title:"Thickness", x:12, y:0, width:30,  height:10, textXOffset:1, textYOffset:7, onclick:"setThicknessClicked()", fontSize:5},
  					{ id:"kerf", title:"Kerf", x:44, y:0, width:30, textXOffset:8,  height:10, textYOffset:7, onclick:"setKerfClicked()", fontSize:5},
- 					{ id:"scale", title:"Scale", x:76, y:0, width:30, textXOffset:7, height:10,  textYOffset:7, onclick:"setScaleClicked()", fontSize:5},
- 					{ id:"joints", title:"Joints", x:108, y:0, width:30, textXOffset:7, height:10,  textYOffset:7, onclick:"setJointsClicked()", fontSize:5}
+ 					{ id:"scale", title:"Scale", x:76, y:0, width:30, textXOffset:7, height:10,  textYOffset:7, onclick:"setScaleClicked()", fontSize:5}
 				]
 
-	let menu = document.createElementNS(svg_NS, "g");
- 	menu.setAttribute("id","editMenu");
- 	laserSvgRoot.appendChild(menu);
+	// Only make a joints button if there are any parametric joints in the template
+	let elements = laserSvgRoot.querySelectorAll('[*|joint-left],[*|joint-top],[*|joint-bottom],[*|joint-right], [*|joint]');
+	if (elements.length > 0) {
+		menuItems.push("joints");
+		buttons.push({ id:"joints", title:"Joints", x:108, y:0, width:30, textXOffset:7, height:10,  textYOffset:7, onclick:"setJointsClicked()", fontSize:5})	
+	}
 
+	let menu = document.createElementNS(svg_NS, "foreignObject");
+ 	menu.setAttribute("id","editMenu");
+ 	menu.setAttribute("width","100%");
+ 	menu.setAttribute("height","20px");
+ 	laserSvgRoot.appendChild(menu);
  	buttons.map(createMenuButton, menu);
 
  	// We also need to adjust the viewbox to shift everythin accordingly
- 		// Scale the SVG viewbox if defined to avoid clipping
+ 	// Scale the SVG viewbox if defined to avoid clipping
 	var vBoxValues = laserSvgRoot.getAttribute("viewBox").replace(/,/g,"").split(" ").map(Number);
-	vBoxValues[0] -= 1
-	vBoxValues[1] -= 12;	
+	//vBoxValues[0] -= 0;
+	vBoxValues[1] -= 10;	
 	laserSvgRoot.setAttribute("viewBox", vBoxValues.join(" "));
+	
  	
 }
 
