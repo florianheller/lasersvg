@@ -2,8 +2,14 @@ html {
 	height: 100%;
 }
 
+h1 {
+	color: #384C6C;
+	font-family: Helvetica, serif;
+	font-weight: normal;
+}
+
 body {
-	font-family: Arial, sans-serif;
+	font-family: Helvetica Neue, Helvetica, sans-serif;
 	background: linear-gradient(#F5F6F8, #E1E4E9);
 	background-size: 100%;
 }
@@ -99,6 +105,32 @@ div label, div input{
 #inner {
 	fill:#A9CE38;
 	stroke: #384C6C;
+}
+
+#pathTemplate {
+	overflow: auto;
+}
+
+#commandTable {
+  width: 100%
+}
+
+/*Make a zebra-style table */
+#commandTable tr:nth-child(even) {
+  background-color: #E1E4E9;
+}
+/* Make the command-column smaller than the rest */
+#commandTable td:first-child {
+	width: 7%;
+}
+#commandTable td {
+	width: 46%;
+}
+#commandTable tr.selected {
+	background-color: #A9CE38;
+}
+#kerfTable td.selected {
+	background-color: #CC13A4
 }
 
 #pathTemplate, #kerfMask {
