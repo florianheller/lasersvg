@@ -28,6 +28,9 @@ var svgRootNode;
 var numberOfFingers = 5;
 
 var taggerActive = false;
+var currentCommandRow = 0;
+var currentKerfCell = 0;
+var currentElement;
 
 const {SVGPathData, SVGPathDataTransformer, SVGPathDataEncoder, SVGPathDataParser} = svgpathdata;
 
@@ -54,7 +57,6 @@ function updateScaling(scalingFactor) {
 
 
 function highlightSegments() {
-	console.log(svgRootNode);
 	//Remove all previous highlights
 	for (let e of svgRootNode.querySelectorAll(".lengthHighlight")) {
 		e.parentNode.removeChild(e);
@@ -141,16 +143,6 @@ function checkLaserSVGFeatures(origin, node) {
 	  	script.setAttribute("type","text/javascript");
 	  	script.setAttributeNS(xlink_NS, "xlink:href","http://www2.heller-web.net/LaserSVG2/lasersvg.js");
 		svgNode.appendChild(script);
-
-		let script2 = document.createElementNS(svg_NS, "script");
-	  	script2.setAttribute("type","text/javascript");
-		script2.setAttributeNS(xlink_NS, "xlink:href","http://www2.heller-web.net/LaserSVG2/path-data-polyfill.js");
-		svgNode.appendChild(script2);
-
-		//var style = document.createElementNS(svg_NS, "style");
-		//style.textContent = '@import url("http://www2.heller-web.net/LaserSVG2/lasersvg.css");';
-		//svgNode.insertBefore(style, svgNode.firstChild);
-
 	}
 }
 
@@ -220,130 +212,106 @@ function svgPathToCommands(str) {
 
 function getCommands(str) {
 	//let commandRegEx = /(([mvlhz] *([-0-9.]|[{].*?thickness.*?[}])+ [-0-9.]*))/gi;
-	let commandRegEx = RegExp('(([mvlhz] *([-0-9.]|[{].*?thickness.*?[}])+ [-0-9.]*))','gi');
+	let commandRegEx = RegExp('(([mvlhz] *([-0-9.]|[{].*?thickness.*?[}])* *([-0-9.]|[{].*?thickness.*?[}])*))','gi');
 	var results = [];
 	var match;
-	while ((match = commandRegEx.exec(str)) !== null) { results.push(match); };
+	while ((match = commandRegEx.exec(str)) !== null) { results.push(match[0]); };
 	return results;
 }
 
-function getCommandAtIndex(str,index) {
-	//let commandRegEx = /(([mvlhz] *([-0-9.]|[{].*?thickness.*?[}])+ [-0-9.]*))/gi;
-	let commandRegEx = RegExp('(([mvlhz] *([-0-9.]|[{].*?thickness.*?[}])+ [-0-9.]*))','gi');
-	var results = [];
-	var match;
-	while ((match = commandRegEx.exec(str)) !== null) { if (match.index <= index && index <= commandRegEx.lastIndex ) return match; };
-}
-
-// http://jsfiddle.net/cpatik/3QAeC/
-//TODO: make this ignore multiple spaces, newlines in the path description
-function getCaretPosition(element) {
-	let caretOffset = 0;
-	var range = window.getSelection().getRangeAt(0);
-        var preCaretRange = range.cloneRange();
-        preCaretRange.selectNodeContents(element);
-        preCaretRange.setEnd(range.endContainer, range.endOffset);
-        caretOffset = preCaretRange.toString().length;
-        return(caretOffset);
-}
-
-function setCaretPosition(elemId, caretPos) {
-    var elem = document.getElementById(elemId);
-
-    if(elem != null) {
-        if(elem.createTextRange) {
-            var range = elem.createTextRange();
-            range.move('character', caretPos);
-            range.select();
-        }
-        else {
-            if(elem.selectionStart) {
-                elem.focus();
-                elem.setSelectionRange(caretPos, caretPos);
-            }
-            else
-                elem.focus();
-        }
-    }
-}
-
-//Converts the numberical value below the cursor to a thickness-marker with the appropriate calculation
-function convertToThickness(position) {
-	let descriptionDiv = document.getElementById("pathTemplate");
-	if (position == undefined) {
-		position = getCaretPosition(descriptionDiv);
-	}
-	let command = getCommandAtIndex(descriptionDiv.innerText, position);
-	console.log(position)
-	// We need the two numerical values in that command, the first letter is the command that can be ignored
-	let numbers = command[0].substring(1).trim().split(' '); 
-
-	// find the cursor position within the command
-	let diff = position - command.index;
-	//console.log("Command " + command[0]);
-	//console.log("Diff" + diff);
-
-	// Rebuilding the string is rather tricky
-
-	let newCommand;
-	//Figure out in which number the click was
-	// At least the first char is the command
-	if (diff > 1 && diff <= numbers[0].length+1) { 
-		let number = Number(numbers[0])/laserSvgScript.materialThickness;
-		console.log(Number(numbers[0]) + " " + laserSvgScript.materialThickness);
-		let snippet = ""
-		if (number == 0) { snippet = " 0 "; }
-		else if (number == 1) { snippet = " {thickness} "; }
-		else if (number == -1) { snippet = " -{thickness} "; } 
-		else { snippet = " {" + number + "*thickness} "; }
-		newCommand = command[0].substring(0,1) + snippet + numbers[1] + " ";
-	}
-	else { 
-		let number = Number(numbers[1])/laserSvgScript.materialThickness;
-		let snippet = ""
-		if (number == 0) { snippet = " 0 "; }
-		else if (number == 1) { snippet = " {thickness} "; }
-		else if (number == -1) { snippet = " -{thickness} "; } 
-		else { snippet = " {" + number + "*thickness} "; }
-		newCommand = command[0].substring(0,1) +" " + numbers[0] + snippet ;
-	}
-
-	let newDescription = descriptionDiv.innerText.substring(0, command.index) + newCommand + descriptionDiv.innerText.substring(command.index + command[0].length);
-
-	descriptionDiv.innerHTML = highlightMarkers(newDescription);
-}
-
-function updatePathSelection(event,id) {
-	//This is the path description. We need to separate it into its subelements and count where in the path the marked section is
-	if (id==0) {
-		var index = getCaretPosition(event);
-		let commands = getCommands(event.innerText);
-		//let command = getCommandAtIndex(event.innerText, index)[0];
-		//We have all the commands, now find the one that is at the location that was clicked
-		let resultIndex = 0;
-		for (let i=1; i<commands.length-1; i++) {
-			console.log(commands[i]);
-			if (commands[i].index <= index && index <= commands[i+1].index ) {
-				resultIndex = i;
+/* pathDescriptionToTable(pathDesccription, table)
+ * @param path: the path whose description should be parsed.
+ * @param table: the table whose tbody will contain the commands and parameters
+ */
+function pathDescriptionToTable(path, table) {
+	// clear any existing content in the table
+	table.innerHTML = "";
+	let commands = []; // An array for the commands
+	// If we have a template, we need to parse it ourselves, but then, at least the format is (hopefully) clear
+	if (path.hasAttributeNS(laser_NS, "template")) {	
+		commands = getCommands(path.getAttributeNS(laser_NS, "template")); //Transform the template string into an array of commands
+		for (let command of commands) {
+			let commandParts = command.split(" "); //Split the commands into its subparts
+			if (commandParts) {
+				let newRow = table.insertRow(-1); //Add a new row at the end of the table
+				for (let i=0; i<commandParts.length; i++) {	//Add command and parameters to the table
+					let newCell = newRow.insertCell(i);
+					newCell.appendChild(document.createTextNode(commandParts[i]));
+				}
 			}
 		}
-		if (resultIndex == 0) {
-			resultIndex = commands.length;
-		}
-		if (resultIndex != 0) {
-			laserSvgScript.highlightPathSegment(laserSvgScript.currentSelection, resultIndex, event.getAttribute("id"));
-		}
-
-		//var test = svgPathToCommands(event.innerText);
-		
 
 	}
-	//([l0-9]?)$
-	// This is the kerf mask, which is easy as every two characters (marker + space) is a new subpath
-	if (id==1) {
-		laserSvgScript.highlightPathSegment(laserSvgScript.currentSelection, Math.floor(getPosition(event)/2)+1,event.getAttribute("id"));
+	// Otherwise, we let the browser do the interpretation of the initial path description with all its possible formats and shorthand notations
+	else { 
+		commands = path.getPathData({normalize: false});
+		for (let command of commands) {
+			let newRow = table.insertRow(-1); //Add a new row at the end of the table
+			let newCell = newRow.insertCell(0);
+			newCell.appendChild(document.createTextNode(command.type));
+			for (let i=0; i<command.values.length; i++) {	//Add command and parameters to the table
+					newCell = newRow.insertCell(i+1);
+					newCell.appendChild(document.createTextNode(command.values[i]));
+				}
+		}
 	}
 }
+
+function convertSubelementToThickness(element, subelement) {
+	// Make sure the info is loaded into the editor
+	didSelectElement(element, subelement);
+
+	// Highlight the according command in the commandTable
+	let commandTable = document.getElementById("commandTable");
+	// clear selection in the commandTable
+	for (let row of commandTable.rows) {
+		row.classList.remove("selected");
+	}
+	commandTable.rows[subelement].classList.add("selected");
+	currentCommandRow = subelement; 
+	if (subelement !== undefined) {
+		convertParametersToThickness(commandTable.rows[subelement])
+	}
+
+}
+
+
+/* Converts all the parameters to a command in the tableRow to thickness-related versions
+ * @param tableRow: the tableRow element in which the command is stored
+ */
+
+function convertParametersToThickness(tableRow) {
+	// Some commands may have more than two parameters
+	for (let i=1; i<tableRow.cells.length; i++) {
+		tableRow.cells[i].innerHTML = convertToThickness(tableRow.cells[i].innerText);
+	}
+}
+
+
+/* Converts the numberical value below the cursor to a thickness-marker with the appropriate calculation
+ * @param size: the size to be transformed into a thickness-related parameter
+ * @return the thickness marker as string
+ */
+
+function convertToThickness(size) {
+	let number = Number(size)/laserSvgScript.materialThickness;
+	if (isNaN(number)) { return size} //If anything goes wrong, just leave everything unchanged (e.g. already converted to thickness)
+	let snippet = ""
+	// Clean the output a bit
+	if (number == 0) { snippet = "0"; }
+	else if (number == 1) { snippet = "{thickness}"; }
+	else if (number == -1) { snippet = "-{thickness}"; } 
+	else { snippet = "{" + number + "*thickness}"; }
+
+	return(snippet);
+}
+
+function convertButtonClicked(event) {
+	convertParametersToThickness(document.getElementById("commandTable").rows[currentCommandRow]);
+}
+
+
+
 
 function toggleMaterialThickness(checkBox) {
 	let element = laserSvgScript.currentSelection;
@@ -360,8 +328,6 @@ function toggleMaterialThickness(checkBox) {
 				}
 				document.getElementById("pathTemplate").innerHTML = description;
 				// Get a list of all 
-				console.log(description);
-				console.log(element.getTotalLength());
 				break;
 
 		case 'rect': break;
@@ -374,19 +340,29 @@ function toggleMaterialThickness(checkBox) {
  */
 function loadParameters(element) {
 
-	//Path description or template
-	var description;
-	if (element.hasAttributeNS(laser_NS, "template")) {	
-				description = highlightMarkers(element.getAttributeNS(laser_NS, "template"));
-	}
-	else { 
-		description = element.getAttribute("d");
-	}
-	document.getElementById("pathTemplate").innerHTML = description;
+	
+	if (element.tagName == "path") { 
+		pathDescriptionToTable(element, document.getElementById("commandTable"));
 
-	//var pathSegmentPattern = /[m,l,z][^m,l,z]*/ig;
-	//var pathSegments = element.getAttributeNS(laser_NS, "template").match(pathSegmentPattern);
-	//console.log(pathSegments);
+		let s = document.getElementById("kerfTable");
+		s.innerHTML = ""; //Clear existing content
+		let newRow = s.insertRow(-1); //Add a new row at the end of the table
+		if (element.hasAttributeNS(laser_NS, "kerf-mask")) {
+			let parts = element.getAttributeNS(laser_NS, "kerf-mask").split(" ");
+			for (let part of parts) {
+				let newCell = newRow.insertCell(-1);
+				newCell.appendChild(document.createTextNode(part));
+			}
+		}
+		else { //If no kerf mask has been specified, create an ignore-all one
+			// Empty any existing content
+			let pathDataLength = element.getPathData().length;
+			for (let i = 0; i < pathDataLength-1; i++) {
+				let newCell = newRow.insertCell(i);
+				newCell.appendChild(document.createTextNode("i"));
+			}
+		}
+	}
 
 	if (element.hasAttributeNS(laser_NS, "thickness-adjust")) {
 		document.getElementById("thicknessSelection").value = element.getAttributeNS(laser_NS, "thickness-adjust");
@@ -395,8 +371,14 @@ function loadParameters(element) {
 		document.getElementById("thicknessSelection").value = "none";
 	}
 
+	if (element.hasAttributeNS(laser_NS,"action")) {
+		document.getElementById("elementActionSelection").value = element.getAttributeNS(laser_NS, "action");	
+	}
+	else  {
+		document.getElementById("elementActionSelection").value = ""
+	}
 	//Joint parameters if present
-	var s = document.getElementById("jointTypeSelection");
+	let s = document.getElementById("jointTypeSelection");
 	if (element.hasAttributeNS(laser_NS, "joint-type")) {
 		s.value = element.getAttributeNS(laser_NS, "joint-type");
 	}
@@ -420,23 +402,14 @@ function loadParameters(element) {
 		s.value = "none";
 	}
 
-	s = document.getElementById("kerfMask");
-	if (element.hasAttributeNS(laser_NS, "kerf-mask")) {
-		s.innerText = element.getAttributeNS(laser_NS, "kerf-mask");
-	}
-	else if (element.tagName == "path") {
-		let s = document.getElementById("kerfMask");
-		// Empty any existing content
-		s.innerText = "";
-		let pathDataLength = element.getPathData().length;
-		for (let i = pathDataLength-1; i > 0 ; i--) {
-			s.innerText += " i ";
-		}
-	}
+	
 }
 
 function setPathTemplate() {
-	laserSvgScript.currentSelection.setAttributeNS(laser_NS, "laser:template", document.getElementById("pathTemplate").innerText)
+	// Build a path description template from the command table
+	let rows = document.getElementById("commandTable").rows;
+	let template = Array.prototype.map.call(rows, (row => Array.prototype.map.call(row.cells, cell => cell.innerText).join(" "))).join (" ");
+	laserSvgScript.currentSelection.setAttributeNS(laser_NS, "laser:template", template);
 }
 
 function setJointType() {
@@ -483,22 +456,22 @@ function setKerfMask() {
 	laserSvgScript.updateDrawing();
 }
 
-function setThicknessAdjustment() {
+function setThicknessAdjustment(event) {
 	let s = document.getElementById("thicknessSelection");
-	console.log("set thickness-adjust to " + s.options[s.selectedIndex].value);
 	laserSvgScript.setPropertyForSelection("thickness-adjust", s.options[s.selectedIndex].value);
 	//laserSvgScript.currentSelection.setAttributeNS(laser_NS, "laser:thickness-adjust", s.options[s.selectedIndex].value);
 	laserSvgScript.updateDrawing();
 }
 
 
-// If we ever need to strip the markers again https://stackoverflow.com/questions/822452/strip-html-from-text-javascript
-function highlightMarkers(template) {
-	return template.replace(/[{](.*?thickness.*?)[}]/g, function (x) { return "<span class=\"marker\">" + x + "</span>" } );
+function elementActionSelectionDidChange(event) {
+	laserSvgScript.setPropertyForSelection("action", event.value);
 }
 
-function toggleTagTool() {
+function toggleTagTool(event) {
 	taggerActive = !taggerActive;
+	event.style.backgroundColor = (event.style.backgroundColor == "") ? "#384C6C":"";
+	event.style.color = (event.style.color == "") ? "white":"";
 	let svgRoot = document.getElementById("drawingObject").contentDocument;
 	if (taggerActive == true) {
 		svgRoot.firstElementChild.style.cursor = 'crosshair';
@@ -509,23 +482,44 @@ function toggleTagTool() {
 
 }
 
+
+/******* Onclick callbacks for elements of the drawing **********/
+
+
 // Delegate function for the selection of a path. 
 function didSelectElement(element, subelement) {
-	loadParameters(element);
+	if (currentElement !== element) {
+		currentElement = element;
+		loadParameters(element);
+	}
 	document.getElementById("parameters").classList.remove("hidden");
 	if (element.tagName == "path") {
 		document.getElementById("pathThickness").classList.remove("hidden");
 		document.getElementById("primitiveThickness").classList.add("hidden");
 		document.getElementById("kerfMaskEditing").classList.remove("hidden");
 		document.getElementById("kerfSelection").classList.add("hidden");
-
-		if (taggerActive == true) {
-			if (subelement !== undefined) {
-				//Set the cursor in the path editor to the position of the selected segment
-				let templateField = document.getElementById("pathTemplate");
-				let commands = getCommands(templateField.innerText);
-				convertToThickness(commands[subelement].index+2);
+		document.getElementById("rectangleSideSelection").classList.add("hidden");
+		// Highlight the according command in the commandTable
+		let commandTable = document.getElementById("commandTable");
+		// clear selection in the commandTable
+		for (let row of commandTable.rows) {
+			row.classList.remove("selected");
+		}
+		if (subelement >= 0) { // The command table includes the first move command
+			commandTable.rows[subelement].classList.add("selected");
+			currentCommandRow = subelement; 
+			if (taggerActive == true) { // If we are currently tagging edges
+				if (subelement !== undefined) {
+					convertParametersToThickness(commandTable.rows[subelement])
+				}
 			}
+		}
+		let kerfTable = document.getElementById("kerfTable");
+		for (let cell of kerfTable.rows[0].cells) {
+			cell.classList.remove("selected");
+		}
+		if (subelement > 0) {
+			kerfTable.rows[0].cells[subelement-1].classList.add("selected");
 		}
 
 	}
@@ -534,6 +528,7 @@ function didSelectElement(element, subelement) {
 		document.getElementById("primitiveThickness").classList.remove("hidden");
 		document.getElementById("kerfMaskEditing").classList.add("hidden");
 		document.getElementById("kerfSelection").classList.remove("hidden");
+		document.getElementById("rectangleSideSelection").classList.remove("hidden")
 	}
 
 }
@@ -552,26 +547,53 @@ function didSelectRectSide(side) {
 
 
 
-// Add Callbacks for the UI Elements
+/********* Callbacks for the UI Elements ***********/
 
 if (button = document.getElementById("zoomIn")) {
 	button.onclick = function() {
-	updateScaling(2);  
+		updateScaling(2);  
 	}
 }
 if (button = document.getElementById("zoomOut")) {
 	button.onclick = function() {
-	updateScaling(0.5); 
+		updateScaling(0.5); 
 	}
 }
 if (slider = document.getElementById("materialSlider")) {
 	slider.onchange = function() {
-	updateThickness(this.value); 
+		updateThickness(this.value); 
 	}
 }
 if (slider = document.getElementById("fingerSlider")) {
 	slider.onchange = function() {
-	updateDrawing(this.value); 
+		updateDrawing(this.value); 
+	}
+}
+// Onclick for the commands in the path command table
+let table = document.getElementById("commandTable")
+if (table) {
+	table.onclick = function(event) {
+		for (let row of table.rows) {
+			row.classList.remove("selected");
+		}
+		currentCommandRow = event.originalTarget.parentNode.rowIndex; 
+		table.rows[currentCommandRow].classList.add("selected");
+
+		laserSvgScript.highlightPathSegment(currentElement, currentCommandRow,"pathTemplate");
+	}
+}
+
+// Onclick for the Kerf-Table
+let kTable = document.getElementById("kerfTable")
+if (kTable) {
+	kTable.onclick = function(event) {
+		if (kTable.rows.length == 0) return; 
+		for (let cell of kTable.rows[0].cells) {
+			cell.classList.remove("selected");
+		}
+		currentKerfCell = event.originalTarget.cellIndex;
+		kTable.rows[0].cells[currentKerfCell].classList.add("selected");
+		laserSvgScript.highlightPathSegment(currentElement, currentKerfCell+1,"kerfTemplate");
 	}
 }
 
