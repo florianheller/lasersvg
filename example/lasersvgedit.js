@@ -300,6 +300,13 @@ function onLengthHighlightClicked(elementID, info) {
 }
 
 
+function removeSegmentHighlights() {
+	//Remove all the highlights that might still be here 
+	let highlights = laserSvgRoot.querySelectorAll('.lengthHighlight');
+	for (let h of highlights) {
+		h.parentNode.removeChild(h)
+	}
+}
 // Callback to redraw after variables have been changed from the outside
 function updateDrawing() {
 	createJoints();

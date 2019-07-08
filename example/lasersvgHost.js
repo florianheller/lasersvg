@@ -62,6 +62,10 @@ function highlightSegments() {
 	laserSvgScript.highlightElementsWithLength(laserSvgScript.materialThickness)
 }
 
+function removeSegmentHighlights() {
+	laserSvgScript.removeSegmentHighlights()
+}
+
 function actionSelectionDidChange(event) {
 	if (event.value == "") {
 		svgRootNode.removeAttributeNS(laser_NS, "action");
