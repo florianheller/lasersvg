@@ -311,30 +311,6 @@ function convertButtonClicked(event) {
 }
 
 
-
-
-function toggleMaterialThickness(checkBox) {
-	let element = laserSvgScript.currentSelection;
-	switch (element.tagName) {
-		// Path and rect are the only interesting ones
-		case 'path': 
-				// We need to turn the current description into a new template by replacing the right number with {thickness}
-				var description;
-				if (element.hasAttributeNS(laser_NS, "laser:template") == true ) {
-					description = element.getAttributeNS(laser_NS, "laser:template");
-				}
-				else { 
-					description = element.getAttribute("d");
-				}
-				document.getElementById("pathTemplate").innerHTML = description;
-				// Get a list of all 
-				break;
-
-		case 'rect': break;
-		default: break;
-	}
-}
-
 /* Loads all relevant parameters from the selected element and updates the UI accordingly
  * @param element: the element from which the parameters should be loaded
  */
