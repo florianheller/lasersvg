@@ -29,8 +29,7 @@
 
 const laser_NS = 'http://www.heller-web.net/lasersvg';
 const svg_NS = 'http://www.w3.org/2000/svg';
-//const laserSvgURL = 'http://www2.heller-web.net/laserSVG2/';
-const laserSvgURL = '';
+const laserSvgURL = 'http://www2.heller-web.net/LaserSVG2/';
 // References to the different points in the DOM
 var parentDocument;
 var laserSvgDocument;
