@@ -431,8 +431,8 @@ function svgLoaded(event) {
 	// Check if we have the lasersvg.css stylesheet loaded by looking wether we find one that has lasersvg.css in the href field.
 	if ([].slice.call(document.styleSheets).filter(styleSheet => styleSheet.href.includes(laserSvgURL+"lasersvg.css")).length == 0) {
 		console.log("No LaserSVG Stylesheet found, adding one")
-		var styleSheet = document.createProcessingInstruction('xml-stylesheet', 'href="lasersvg.css" type="text/css"');
-		document.insertBefore(styleSheet, document.firstChild);
+		let styleSheet = document.createProcessingInstruction('xml-stylesheet', 'href="'+laserSvgURL+'lasersvg.css" type="text/css"');
+		event.insertBefore(styleSheet, document.firstChild);
 	}
 
 
