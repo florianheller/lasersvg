@@ -32,6 +32,8 @@ var currentCommandRow = 0;
 var currentKerfCell = 0;
 var currentElement;
 
+var openingNewFile = false;
+
 const {SVGPathData, SVGPathDataTransformer, SVGPathDataEncoder, SVGPathDataParser} = svgpathdata;
 
 function updateThickness(materialThickness) {
@@ -91,8 +93,18 @@ function updateDrawing(numberOfFingers) {
 
 
 function svgDidLoad(script) {
-	laserSvgScript = script;
-	svgRootNode = document.getElementById("drawingObject").contentDocument.firstElementChild;
+	console.log("svgDidLoad");
+	svgRootNode = document.getElementById('drawingObject').getSVGDocument().firstElementChild;
+	if (openingNewFile == true) {
+		openingNewFile = false;
+		laserSvgScript = script;
+		console.log("here shoud only appear once");
+		//script.laserIsLoaded=false;
+		//script.svgLoaded(svgRootNode);
+	}
+	
+	// The rest just updates the UI elements, is thus not harmful
+	
 
 	let factorDisplay = document.getElementById('materialThickness');
   	factorDisplay.innerHTML = script.materialThickness;
@@ -108,41 +120,58 @@ function svgDidLoad(script) {
 function openFile(files) {
 	var file = files[0];
 	if(file.type === 'image/svg+xml'){
+		openingNewFile = true;
 		newObj = document.createElement("object");
 		newObj.setAttribute("id","drawingObject");
 		newObj.setAttribute("type","image/svg+xml");
+		newObj.onload = function(event) {
+			checkLaserSVGFeatures(this, this.getSVGDocument());
+      	} 
 		newObj.data = window.URL.createObjectURL(file);
 		var obj = document.getElementById('drawingObject');
-		obj.data = window.URL.createObjectURL(file);
-		newObj.onload = function() {
-			console.log("loaded" + this);
-			checkLaserSVGFeatures(this, newObj.contentDocument);
-			//newObj.contentDocument.location.reload(true);
-	        //window.URL.revokeObjectURL(this.src);
-      	} 
 		obj.parentNode.replaceChild(newObj, obj);
     }
 }
 
 function checkLaserSVGFeatures(origin, node) {
-	var svgNode = node.getElementsByTagName('svg')[0];
+	let svgNode = node.firstChild;
+	console.log(origin)
+	console.log(node)
+	// Add the LaserSVG Stuff if needed
+    if (!svgNode) { return }
 
-	// We need the xlink namespace to add JS-File references. 
-	if (svgNode && svgNode.getAttribute("xmlns:xlink") == null) {	
-	  	svgNode.setAttributeNS("http://www.w3.org/2000/xmlns/","xmlns:xlink","http://www.w3.org/1999/xlink");
-	}
-
-	// Add the LaserSVG Stuff is needed
-    if (svgNode && svgNode.getAttribute("xmlns:laser") == null) {
+    if (svgNode.getAttribute("xmlns:laser") == null) {
 	  	console.log("Not a lasersvg file, adding elements");
 	  	svgNode.setAttributeNS("http://www.w3.org/2000/xmlns/","xmlns:laser",laser_NS);
 
 
+		// We need the xlink namespace to add JS-File references. 
+		if (svgNode && svgNode.getAttribute("xmlns:xlink") == null) {	
+		  	svgNode.setAttributeNS("http://www.w3.org/2000/xmlns/","xmlns:xlink","http://www.w3.org/1999/xlink");
+		}
+
+		//let styleSheet = document.createProcessingInstruction('xml-stylesheet', 'href="http://www2.heller-web.net/LaserSVG2/lasersvg.css" type="text/css"');
+		//node.insertBefore(styleSheet, node.firstChild);
+
 	  	let script = document.createElementNS(svg_NS, "script");
-		script.src = "http://www2.heller-web.net/LaserSVG2/lasersvg.js";
 	  	script.setAttribute("type","text/javascript");
-	  	script.setAttributeNS(xlink_NS, "xlink:href","http://www2.heller-web.net/LaserSVG2/lasersvg.js");
 		svgNode.appendChild(script);
+
+		// if (script.readyState) {
+		// 	this.onreadystatechange = function () {
+		// 	   if (script.readyState == "loaded" || script.readyState == "complete") {
+  //                   script.onreadystatechange = null;
+  //               }
+  //           }
+  //       } else {
+  //           script.onload = function (event) {
+  //           	console.log("Script onload");
+  //               //script.svgLoaded(svgNode);
+  //           }
+  //       }
+		
+	  	script.setAttributeNS(xlink_NS, "xlink:href","http://www2.heller-web.net/LaserSVG2/lasersvg.js");
+	  	script.src = "http://www2.heller-web.net/LaserSVG2/lasersvg.js";
 	}
 }
 
