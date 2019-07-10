@@ -495,7 +495,6 @@ function checkURLParameters() {
 // If the file is loaded directly (without editor), this function gets called once the file and all dependencies are loaded, which 
 // means it's safe to run the script.
 document.addEventListener("DOMContentLoaded", function(e) {
-	console.log("DOMContentLoaded");
       svgLoaded(document);
 });
 

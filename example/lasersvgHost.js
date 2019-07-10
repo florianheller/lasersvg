@@ -98,13 +98,10 @@ function svgDidLoad(script) {
 	if (openingNewFile == true) {
 		openingNewFile = false;
 		laserSvgScript = script;
-		console.log("here shoud only appear once");
-		//script.laserIsLoaded=false;
-		//script.svgLoaded(svgRootNode);
+
 	}
 	
 	// The rest just updates the UI elements, is thus not harmful
-	
 
 	let factorDisplay = document.getElementById('materialThickness');
   	factorDisplay.innerHTML = script.materialThickness;
@@ -135,8 +132,7 @@ function openFile(files) {
 
 function checkLaserSVGFeatures(origin, node) {
 	let svgNode = node.firstChild;
-	console.log(origin)
-	console.log(node)
+
 	// Add the LaserSVG Stuff if needed
     if (!svgNode) { return }
 
@@ -150,25 +146,10 @@ function checkLaserSVGFeatures(origin, node) {
 		  	svgNode.setAttributeNS("http://www.w3.org/2000/xmlns/","xmlns:xlink","http://www.w3.org/1999/xlink");
 		}
 
-		//let styleSheet = document.createProcessingInstruction('xml-stylesheet', 'href="http://www2.heller-web.net/LaserSVG2/lasersvg.css" type="text/css"');
-		//node.insertBefore(styleSheet, node.firstChild);
-
 	  	let script = document.createElementNS(svg_NS, "script");
 	  	script.setAttribute("type","text/javascript");
 		svgNode.appendChild(script);
 
-		// if (script.readyState) {
-		// 	this.onreadystatechange = function () {
-		// 	   if (script.readyState == "loaded" || script.readyState == "complete") {
-  //                   script.onreadystatechange = null;
-  //               }
-  //           }
-  //       } else {
-  //           script.onload = function (event) {
-  //           	console.log("Script onload");
-  //               //script.svgLoaded(svgNode);
-  //           }
-  //       }
 		
 	  	script.setAttributeNS(xlink_NS, "xlink:href","http://www2.heller-web.net/LaserSVG2/lasersvg.js");
 	  	script.src = "http://www2.heller-web.net/LaserSVG2/lasersvg.js";
@@ -183,7 +164,7 @@ function saveSVG() {
 	var svgUrl = URL.createObjectURL(svgBlob);
 	var downloadLink = document.createElement("a");
 	downloadLink.href = svgUrl;
-	downloadLink.download = "laserExport.svg";
+	downloadLink.download = "laserSVG.svg";
 	document.body.appendChild(downloadLink);
 	downloadLink.click();
 	document.body.removeChild(downloadLink);
