@@ -414,19 +414,22 @@ function getImageForExport() {
 // This function gets called by the JavaScript embedded into the SVG file. 
 // Setting the variable allows us to access the embedded JS to update parameters.
 function svgLoaded(event) {
-	console.log("SVG Loaded");
 	// check wether this has been called already
 	// this can happen when the SVG-File has some part of the LaserSVG components set
 	// and gets loaded into the editor. 
-	if (laserIsLoaded == true) return;
-		console.log("Laser SVG Loaded");
+	if (laserIsLoaded == true) { return; }
+	laserIsLoaded = true;
+	console.log("Laser SVG Loaded");
 
 	// Setting up pointers to the document root itself.
-	laserSvgDocument = event; 
+	if (event.tagName == "svg") {
+		laserSvgRoot = event;
+	}
+	else {
+		laserSvgRoot = event.documentElement; // This is the case if the svg is loaded directly
+	}
 
-	//laserSvgScript = event;	// A pointer to this very script in order to allow an embedding document to call functions on this script
-	//laserSvgDocument = event.target.ownerDocument;	// A pointer to our own SVG document, to make sure we have the correct pointer even if we are embedded in another document
-	laserSvgRoot = laserSvgDocument.documentElement;	// The DOM-Root of our svg document.
+	
 
 	// Check if we have the lasersvg.css stylesheet loaded by looking wether we find one that has lasersvg.css in the href field.
 	if ([].slice.call(document.styleSheets).filter(styleSheet => styleSheet.href.includes(laserSvgURL+"lasersvg.css")).length == 0) {
@@ -434,7 +437,6 @@ function svgLoaded(event) {
 		let styleSheet = document.createProcessingInstruction('xml-stylesheet', 'href="'+laserSvgURL+'lasersvg.css" type="text/css"');
 		event.insertBefore(styleSheet, document.firstChild);
 	}
-
 
 	if ((!checkURLParameters()) && laserSvgRoot.hasAttributeNS(laser_NS,"material-thickness")) {
 		materialThickness = Number(laserSvgRoot.getAttributeNS(laser_NS,"material-thickness"));
@@ -449,7 +451,7 @@ function svgLoaded(event) {
 	// TODO: draw the lines visualizing the connections.
 	
 	// If the embedding document supports it, make our functions available
-	if(window.parent.svgDidLoad) { 
+	if(typeof window.parent.svgDidLoad === "function") { 
 		parentDocument = window.parent; //We need this pointer in edit mode
 		window.parent.svgDidLoad(this);
 		// Add the event handlers for editing
@@ -459,7 +461,7 @@ function svgLoaded(event) {
 		addMiniEditMenu();
 	}
 
-	laserIsLoaded = true;
+
 }
 
 // This function checks wether parameters have been specified through the URL and will adjust the template accordingly;
@@ -490,10 +492,23 @@ function checkURLParameters() {
 }
 
 
-// If the file was not yet a LaserSVG File, then the onload statement is missing and the callback never gets called
-// therefore, we call it once again here. The callback performs a check wether it was already called or not. 
+// If the file is loaded directly (without editor), this function gets called once the file and all dependencies are loaded, which 
+// means it's safe to run the script.
 document.addEventListener("DOMContentLoaded", function(e) {
+	console.log("DOMContentLoaded");
       svgLoaded(document);
 });
 
-svgLoaded(document);
+// If we get loaded in an editor, it's a bit more tricky. 
+// If the <script> statement is at the beginning of the file, it might run before the entire DOM of the SVG is loaded, meaning we'll run into a series of 
+// issues of elements which we rely on not being there (like the SVG root node).
+// So we need to delay this somehow until the DOM is loaded completely. 
+// The problem is, that the onload triggers do not work inside the SVG, as we are embedded in an HTML page. 
+// 
+
+
+// If the script gets added dynamically to an SVG, the eventListener above will not get fired. 
+if(typeof window.parent.svgDidLoad === "function") { 
+	svgLoaded(document);
+}
+
