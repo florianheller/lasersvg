@@ -258,6 +258,8 @@ function onLengthHighlightClicked(event, elementID, info, otherHighlight) {
 			element.setAttributeNS(laser_NS, "laser:thickness-adjust", info)
 			event.parentNode.removeChild(event);
 			if (otherHighlight) { otherHighlight.parentNode.removeChild(otherHighlight); }
+			parentDocument.loadParameters(element);
+
 			break;
 		case "path": 
 			parentDocument.convertSubelementToThickness(element, info);
