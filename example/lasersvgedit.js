@@ -72,7 +72,8 @@ function createMenuButton(item, index, array) {
 				]
 
 	// Only make a joints button if there are any parametric joints in the template
-	let elements = laserSvgRoot.querySelectorAll('[*|joint-left],[*|joint-top],[*|joint-bottom],[*|joint-right], [*|joint]');
+	//let elements = laserSvgRoot.querySelectorAll('[*|joint-left],[*|joint-top],[*|joint-bottom],[*|joint-right],[*|joint]');
+	let elements = laserSvgRoot.querySelectorAll('[*|joint]');
 	if (elements.length > 0) {
 		menuItems.push("joints");
 		buttons.push({ id:"joints", title:"Joints", x:108, y:0, width:30, textXOffset:7, height:10,  textYOffset:7, onclick:"setJointsClicked()", fontSize:5})	
