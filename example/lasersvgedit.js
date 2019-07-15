@@ -10,10 +10,10 @@
  */
 
 
-var menuItems = ["thickness", "kerf", "scale"]
+var menuItems = ["thicknessButton", "kerfButton", "scaleButton"]
 
 function toggleItem(item) {
-	laserSvgRoot.getElementById(item+"Button").style.opacity = (laserSvgRoot.getElementById(item+"Button").style.opacity == 1) ? 0 : 1;
+	laserSvgRoot.getElementById(item).style.opacity = (laserSvgRoot.getElementById(item).style.opacity == 1) ? 0 : 1;
 }
 
 function showMenu() {
@@ -42,6 +42,39 @@ function setScaleClicked() {
   	}
 }
 
+function setJointsChanged() {
+
+}
+
+function createJointSelection(parent) {
+ 	let selection = document.createElementNS("http://www.w3.org/1999/xhtml", "select");
+ 	selection.id = "jointSelection";
+ 	
+ 	let optGroup = document.createElementNS("http://www.w3.org/1999/xhtml", "optgroup");
+ 	optGroup.style.fontSize = "14px";
+
+ 	let options = ["none", "flap", "finger", "finger-compact", "tslot"];
+ 	
+ 	options.map(function(option) { 
+		let o = document.createElementNS("http://www.w3.org/1999/xhtml", "option");
+		o.value = option;
+		o.text = option;
+		o.style.opacity = 1;
+		this.appendChild(o); }, optGroup);
+ 	selection.add(optGroup, null);
+
+ 	parent.appendChild(selection);
+
+ 	selection.onchange = function (event) {
+ 		let elements = laserSvgRoot.querySelectorAll('[*|joint]');
+ 		for (let element of elements) {
+ 			element.setAttributeNS(laser_NS,"joint-type",event.target.value);
+ 		}
+ 		updateDrawing();
+ 	}
+
+}
+
 
 function createMenuButton(item, index, array) {
 
@@ -62,6 +95,7 @@ function createMenuButton(item, index, array) {
         <button type="button" id="kerf" xmlns="http://www.w3.org/1999/xhtml" onclick="setKerfClicked()">Kerf</button>
         <button type="button" id="scale" xmlns="http://www.w3.org/1999/xhtml" onclick="setScaleClicked()">Scale</button>
         <button type="button" id="joints" xmlns="http://www.w3.org/1999/xhtml" onclick="setJointsClicked()">Joint</button>
+        <select xmlns="http://www.w3.org/1999/xhtml" id="selection" style="opacity: 1;"><option value="none">none</option><option value="flap">flap</option><option value="finger">finger</option><option value="finger-compact">finger-compact</option><option value="tslot">tslot</option></select>
    	</foreignObject>
  */ 
  function addMiniEditMenu() {
@@ -71,26 +105,28 @@ function createMenuButton(item, index, array) {
  					{ id:"scale", title:"Scale", x:76, y:0, width:30, textXOffset:7, height:10,  textYOffset:7, onclick:"setScaleClicked()", fontSize:5}
 				]
 
+	let menu = document.createElementNS(svg_NS,"foreignObject");
+ 	menu.setAttribute("id","editMenu");
+ 	menu.setAttribute("width","250");
+ 	menu.setAttribute("height","20");
+
+ 	laserSvgRoot.appendChild(menu);
+ 	buttons.map(createMenuButton, menu);
+
 	// Only make a joints button if there are any parametric joints in the template
 	//let elements = laserSvgRoot.querySelectorAll('[*|joint-left],[*|joint-top],[*|joint-bottom],[*|joint-right],[*|joint]');
 	let elements = laserSvgRoot.querySelectorAll('[*|joint]');
 	if (elements.length > 0) {
-		menuItems.push("joints");
-		buttons.push({ id:"joints", title:"Joints", x:108, y:0, width:30, textXOffset:7, height:10,  textYOffset:7, onclick:"setJointsClicked()", fontSize:5})	
+		menuItems.push("jointSelection");
+	//	buttons.push({ id:"joints", title:"Joints", x:108, y:0, width:30, textXOffset:7, height:10,  textYOffset:7, onclick:"setJointsClicked(this)", fontSize:5})	
+		createJointSelection(document.getElementById("editMenu"));
 	}
-
-	let menu = document.createElementNS(svg_NS, "foreignObject");
- 	menu.setAttribute("id","editMenu");
- 	menu.setAttribute("width","100%");
- 	menu.setAttribute("height","20px");
- 	laserSvgRoot.appendChild(menu);
- 	buttons.map(createMenuButton, menu);
 
  	// We also need to adjust the viewbox to shift everythin accordingly
  	// Scale the SVG viewbox if defined to avoid clipping
 	var vBoxValues = laserSvgRoot.getAttribute("viewBox").replace(/,/g,"").split(" ").map(Number);
 	//vBoxValues[0] -= 0;
-	vBoxValues[1] -= 10;	
+	vBoxValues[1] -= 15;	
 	laserSvgRoot.setAttribute("viewBox", vBoxValues.join(" "));
 	
  	
