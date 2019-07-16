@@ -7,34 +7,30 @@
     http://github.com/florianheller/lasersvg
     http://www.heller-web.net/lasersvg
 -->
-<?xml-stylesheet type="text/css" href="lasersvg.css"?>
-<svg width="270mm" height="100mm" version="1.1" viewBox="-5 -5 270 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:laser="http://www.heller-web.net/lasersvg" laser:material-thickness="3" laser:kerf="0.2">
+<?xml-stylesheet type="text/css" href="http://www2.heller-web.net/LaserSVG2/lasersvg.css"?>
+<svg width="270mm" height="100mm" version="1.1" viewBox="-5, -5, 270, 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:laser="http://www.heller-web.net/lasersvg" laser:material-thickness="3" laser:kerf="0.2">
 	<script type="text/javascript" xlink:href="http://www2.heller-web.net/LaserSVG2/lasersvg.js" />
-	<script type="text/javascript" xlink:href="http://www2.heller-web.net/LaserSVG2/path-data-polyfill.js" />
-
-    <rect x="10" y="10" />
-
+     
 	<path id="benchPlank" d="m 55 0 l 150 0 l 0 5 l 3 0 l 0 5 l -3 0 l 0 5 l 3 0 l 0 5 l -3 0 l 0 5 l -150 0 l 0 -5 l -3 0 l 0 -5 l 3 0 l 0 -5 l -3 0 l 0 -5 l 3 0 z" laser:template="m 55 0 l 150 0 l 0 5 l {thickness} 0 l 0 5 l -{thickness} 0 l 0 5 l {thickness} 0 l 0 5 l -{thickness} 0 l 0 5 l -150 0 l 0 -5 l -{thickness} 0 l 0 -5 l {thickness} 0 l 0 -5 l -{thickness} 0 l 0 -5 l {thickness} 0 z" laser:kerf-mask="i i g i s i g i s i i i g i s i g i s i"
-            stroke="#384C6C" stroke-width="0.5" fill="#E1E4E9" />
+           />
     <path id="benchPlank2" d="m 55 25 
             l 150 0 l 0 5 l 3 0 l 0 5 l -3 0 l 0 5 l 3 0 l 0 5 l -3 0 l 0 5 
             l -150 0 l 0 -5 l -3 0 l 0 -5 l 3 0 l 0 -5 l -3 0 l 0 -5 l 3 0 z" laser:template="m 55 25 
             l 150 0 l 0 5 l {thickness} 0 l 0 5 l -{thickness} 0 l 0 5 l {thickness} 0 l 0 5 l -{thickness} 0 l 0 5 
             l -150 0 l 0 -5 l -{thickness} 0 l 0 -5 l {thickness} 0 l 0 -5 l -{thickness} 0 l 0 -5 l {thickness} 0 z"
-            laser:kerf-mask="i i g i g i g i g i i i g i g i g i g i"
-            stroke="#384C6C" stroke-width="0.5" fill="#E1E4E9" />
-     <g id="benchSide" stroke="#384C6C" stroke-width="0.5" fill="#E1E4E9">
+            laser:kerf-mask="i i g i g i g i g i i i g i g i g i g i"/>
+     <g id="benchSide">
             <rect x="0" y="0" width="50" height="50"/>
-            <g fill="#FFFFFF" stroke="#384C6C" stroke-width="0.2">
-                <rect x="15" y="30" width="5" height="3" laser:thickness-adjust="height" laser:origin="bottom" laser:kerf-adjust="shrink" laser:operation="cut"/>
-                <rect x="25" y="30" width="5" height="3" laser:thickness-adjust="height" laser:origin="bottom" laser:kerf-adjust="shrink" />
+            <g>
+                <rect x="15" y="30" width="5" height="3" laser:thickness-adjust="height" laser:origin="bottom" laser:kerf-adjust="shrink" laser:action="cut"/>
+                <rect x="25" y="30" width="5" height="3" laser:thickness-adjust="height" laser:origin="bottom" laser:kerf-adjust="shrink" laser:action="engrave"/>
                 <rect x="40" y="5" width="3" height="5"  laser:thickness-adjust="width" laser:origin="right" laser:kerf-adjust="shrink" />
                 <rect x="40" y="15" width="3" height="5" laser:thickness-adjust="width" laser:origin="right" laser:kerf-adjust="shrink" />
             </g>
     </g> 
-    <g id="benchSide2"  stroke="#384C6C" stroke-width="0.5" fill="#E1E4E9">
+    <g id="benchSide2">
         <rect x="210" y="0" width="50" height="50"/>
-        <g fill="#FFFFFF" stroke="#384C6C" stroke-width="0.2">
+        <g>
             <rect x="225" y="30" width="5" height="3" laser:thickness-adjust="height" laser:kerf-adjust="shrink" />
     	    <rect x="235" y="30" width="5" height="3" laser:thickness-adjust="height" laser:kerf-adjust="shrink" />
             <rect x="250" y="5" width="3" height="5"  laser:thickness-adjust="width" laser:kerf-adjust="shrink" />
