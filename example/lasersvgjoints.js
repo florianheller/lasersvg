@@ -178,30 +178,41 @@ function createFlapJointPath(path, gap, inset, flaps) {
 	//The first element of the first path segment list, as this determines the origin
 	let newPathData = []; 
 	newPathData.push(pathData[0]);
- 	
- 	newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
- 	
-	//We are now at the point to add the first finger
-	for (var i = 0; i < flaps; i += 1) {
-		//newPathData.push({type: "l", values: [inset, inset]});
-		let stepX = (cos * inset) + (Math.cos(alpha+(Math.PI/2)) * inset);
-		let stepY = (sin * inset) + (Math.sin(alpha+(Math.PI/2)) * inset);
 
-		let stepX2 = (cos * inset) + (Math.cos(alpha-(Math.PI/2)) * inset);
-		let stepY2 = (sin * inset) + (Math.sin(alpha-(Math.PI/2)) * inset);
+	// There's no inside for a flap
+	// The inside is just a straight line between the endpoints
 
- 		newPathData.push({type: "l", values: [stepX, stepY]});
- 		newPathData.push({type: "l", values: [(cos * (fingerSize-2*inset)) , (sin * (fingerSize - 2*inset))]});
- 		//newPathData.push({type: "l", values: [inset, -inset]});
- 		newPathData.push({type: "l", values: [stepX2, stepY2]});
+	if (inset < 0) { 
 
-		//if (i != flaps-1) {
-		//	newPathData.push({type: "l", values: [cos * fingerSize, sin * fingerSize]});
-		//}
+		newPathData.push({type: "l", values: [width, height]});
+
 	}
+	else {
+	 	
+	 	newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
+	 	
+		//We are now at the point to add the first finger
+		for (let i = 0; i < flaps; i += 1) {
+			//newPathData.push({type: "l", values: [inset, inset]});
+			let stepX = (cos * inset) + (Math.cos(alpha+(Math.PI/2)) * inset);
+			let stepY = (sin * inset) + (Math.sin(alpha+(Math.PI/2)) * inset);
 
-	// Close the second gap
-	newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
+			let stepX2 = (cos * inset) + (Math.cos(alpha-(Math.PI/2)) * inset);
+			let stepY2 = (sin * inset) + (Math.sin(alpha-(Math.PI/2)) * inset);
+
+	 		newPathData.push({type: "l", values: [stepX, stepY]});
+	 		newPathData.push({type: "l", values: [(cos * (fingerSize-2*inset)) , (sin * (fingerSize - 2*inset))]});
+	 		//newPathData.push({type: "l", values: [inset, -inset]});
+	 		newPathData.push({type: "l", values: [stepX2, stepY2]});
+
+			//if (i != flaps-1) {
+			//	newPathData.push({type: "l", values: [cos * fingerSize, sin * fingerSize]});
+			//}
+		}
+
+		// Close the second gap
+		newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
+		}
 
 	path.setPathData(newPathData);
 	
@@ -336,7 +347,7 @@ function createJoints() {
 		// Get the direction of the joint
 		let direction = -1;
 		if (path.hasAttributeNS(laser_NS,'joint-direction')) {
-			if (path.getAttributeNS(laser_NS,'joint-direction') == 'inside') {
+			if (path.getAttributeNS(laser_NS,'joint-direction') == 'outside') {
 				direction = 1;
 			}
 		}
@@ -345,7 +356,7 @@ function createJoints() {
 			switch(path.getAttributeNS(laser_NS,'joint-type')) {
 				case 'finger': createFingerJointPath(path, 5, materialThickness * direction, numberOfFingers); break;
 				case 'finger-compact': createCompactFingerJointPath(path, 5, materialThickness * direction, numberOfFingers); break;
-				case 'flap': createFlapJointPath(path, 5, materialThickness, 2); break;
+				case 'flap': createFlapJointPath(path, 5, materialThickness * direction, 2); break;
 				case 'tslot': createTSlotPath(path, 5, materialThickness * direction, numberOfFingers); break;
 				default: break;
 			}
@@ -368,9 +379,9 @@ function replacePrimitive(rect) {
 
 	// Top
 	let pathTop = document.createElementNS("http://www.w3.org/2000/svg", "path");
-	var pathData = [
-		{ type: "M", values: [x  , y] },
-		{ type: "l", values: [width, 0] }
+	let pathData = [
+		{ type: "M", values: [x+width  , y] },
+		{ type: "l", values: [-width, 0] }
 	]; 
 	pathTop.setPathData(pathData);
 	transferAttributes(rect, pathTop, "top");
@@ -388,9 +399,9 @@ function replacePrimitive(rect) {
 	pathRight.setAttributeNS(laser_NS,"template",pathRight.getAttribute("d"));
 	// Bottom
 	let pathBottom = document.createElementNS("http://www.w3.org/2000/svg", "path");
-	var pathData = [
-		{ type: "M", values: [x + width , y + height] },
-		{ type: "l", values: [-width, 0] }
+	let pathData = [
+		{ type: "M", values: [x , y + height] },
+		{ type: "l", values: [width, 0] }
 	]; 
 	pathBottom.setPathData(pathData);
 	transferAttributes(rect, pathBottom, "bottom");
