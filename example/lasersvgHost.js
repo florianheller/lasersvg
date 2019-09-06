@@ -97,9 +97,8 @@ function svgDidLoad(script) {
 	svgRootNode = document.getElementById('drawingObject').getSVGDocument().firstElementChild;
 	if (openingNewFile == true) {
 		openingNewFile = false;
-		laserSvgScript = script;
-
 	}
+		laserSvgScript = script;
 	
 	// The rest just updates the UI elements, is thus not harmful
 
