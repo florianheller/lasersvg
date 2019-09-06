@@ -109,10 +109,11 @@ div label, div input{
 
 #pathTemplate {
 	overflow: auto;
+	max-height: 250px;
 }
 
 #commandTable {
-  width: 100%
+  width: 100%;
 }
 
 /*Make a zebra-style table */
