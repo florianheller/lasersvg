@@ -119,11 +119,14 @@ function createCompactFingerJointPath(path, gap, inset, fingers) {
 
 	//We are now at the point to add the first finger
 	for (let i = 0; i < fingers; i += 1) {
- 		newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * inset), (Math.sin(alpha+(Math.PI/2)) * inset)]});
- 		
- 		newTemplate.push({type: "l", values: ["{(" + (Math.cos(alpha+(Math.PI/2)) * inset/(2*materialThickness) + "*thickness)-0.5}"), "{(" + (Math.sin(alpha+(Math.PI/2)) * inset/(2*materialThickness) + "*thickness)-0.5}")]});
+ 		newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * (inset-0.5)/2), (Math.sin(alpha+(Math.PI/2)) * (inset-0.5)/2)]});
+ 		newTemplate.push({type: "l", values: ["{" + (Math.cos(alpha+(Math.PI/2)) * (inset-0.5)/(2*materialThickness) + "*thickness}"), "{" + (Math.sin(alpha+(Math.PI/2)) * (inset-0.5)/(2*materialThickness) + "*thickness}")]});
+
+ 		newPathData.push({type: "a", values: [kerf, kerf, 0, 1, 0, (Math.cos(alpha+(Math.PI/2)))*0.5 , (Math.sin(alpha+(Math.PI/2)))*0.5 ]});
  		newTemplate.push({type: "a", values: [kerf, kerf, 0, 1, 0, (Math.cos(alpha+(Math.PI/2)))*0.5 , (Math.sin(alpha+(Math.PI/2)))*0.5 ]});
-		newTemplate.push({type: "l", values: ["{(" + (Math.cos(alpha+(Math.PI/2)) * inset/(2*materialThickness) + "*thickness)-0.5}"), "{(" + (Math.sin(alpha+(Math.PI/2)) * inset/(2*materialThickness) + "*thickness)-0.5}")]});
+
+ 		newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * (inset-0.5)/2), (Math.sin(alpha+(Math.PI/2)) * (inset-0.5)/2)]});
+		newTemplate.push({type: "l", values: ["{" + (Math.cos(alpha+(Math.PI/2)) * (inset-0.5)/(2*materialThickness) + "*thickness}"), "{" + (Math.sin(alpha+(Math.PI/2)) * (inset-0.5)/(2*materialThickness) + "*thickness}")]});
 
  		newPathData.push({type: "l", values: [(cos * fingerSize), (sin * fingerSize)]});
  		newTemplate.push({type: "l", values: [(cos * fingerSize), (sin * fingerSize)]});
@@ -389,7 +392,7 @@ function replacePrimitive(rect) {
 	pathTop.setAttributeNS(laser_NS,"laser:template",pathTop.getAttribute("d"));
 	// Right
 	let pathRight = document.createElementNS("http://www.w3.org/2000/svg", "path");
-	let pathData = [
+	pathData = [
 		{ type: "M", values: [x + width , y + height] },
 		{ type: "l", values: [0, -height] }
 	]; 
@@ -399,7 +402,7 @@ function replacePrimitive(rect) {
 	pathRight.setAttributeNS(laser_NS,"template",pathRight.getAttribute("d"));
 	// Bottom
 	let pathBottom = document.createElementNS("http://www.w3.org/2000/svg", "path");
-	let pathData = [
+	pathData = [
 		{ type: "M", values: [x , y + height] },
 		{ type: "l", values: [width, 0] }
 	]; 
@@ -409,7 +412,7 @@ function replacePrimitive(rect) {
 	pathBottom.setAttributeNS(laser_NS,"laser:template",pathBottom.getAttribute("d"));
 	// Left
 	let pathLeft = document.createElementNS("http://www.w3.org/2000/svg", "path");
-	let pathData = [
+	pathData = [
 		{ type: "M", values: [x  , y ] },
 		{ type: "l", values: [0, height] }
 	]; 
