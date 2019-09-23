@@ -319,8 +319,10 @@ function setPropertyForSelection(property, value) {
 
 function addEditEventHandlers() {
 	let tags = ['path', 'rect', 'circle'];
-	for (var tag of tags) {
+	for (let tag of tags) {
 		let elements = laserSvgRoot.getElementsByTagName(tag);
+		console.log(elements);
+		console.log(elements.length);
 		for (let element of elements) {
 			element.onclick = function (event) {
 				let segmentIndex = isInWhichSegment(this, event.clientX, event.clientY);

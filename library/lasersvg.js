@@ -18,7 +18,6 @@
  *
  *	TODO: replace use-links to defs in the DOM
  *	TODO: ungroup groups in the working DOM
- *  TODO: handle close-path commands (results in NaN coordinates)
  *  TODO: only convert rects to paths when needed. 
  *	TODO: provide a list of joint types and their parameters as info-dictionaries
  *	TODO: Finish template generation for rects with specified material thickness attributes
@@ -66,6 +65,9 @@ function updateThickness(newThickness) {
 	var elements = laserSvgRoot.querySelectorAll('*');
 
 	for (let element of elements) {
+			if (element.hasAttributeNS(laser_NS,'thickness')) {
+				thickness = element.getAttributeNS(laser_NS,'thickness');
+			}
 			// If the origin is specified, 
 			if (element.hasAttributeNS(laser_NS,'origin')) {
 				// In that case, we also need to adjust the position of the element. 
@@ -115,8 +117,8 @@ function updateThickness(newThickness) {
 		// Check if the element has a template attribute
 		if (element.hasAttributeNS(laser_NS,'template')) {
 			// We need to multiply thickness with inverted scalingFactor as the path will be scaled afterwards
-			useTemplateWithThickness(element, thickness / scalingFactor);
-			scalePath(element);
+			useTemplateWithThickness(element, thickness / this.scalingFactor);
+			scalePath(element, this.scalingFactor);
 		}
 	}
 }
@@ -130,12 +132,9 @@ function updateThickness(newThickness) {
 function scale(scalingFactor) {
 
 	//iterate over all objects and scale them accordingly
-	//var elements = laserSvgRoot.querySelectorAll('*');
-	//
 
 	this.scalingFactor *= scalingFactor;
-
-	let tags = ['path', 'rect', 'circle'];
+	let tags = ['path', 'rect', 'circle', 'ellipse'];
 	for (let tag of tags) {
 		var elements = laserSvgRoot.getElementsByTagName(tag);
 		for (let element of elements) {
@@ -150,8 +149,21 @@ function scale(scalingFactor) {
 			if (element.hasAttribute("y")) {
 				element.setAttribute("y", Number(element.getAttribute("y"))*scalingFactor);
 			}
+			// Circles and ellipses
+			if (element.hasAttribute("cx")) {
+				element.setAttribute("cx", Number(element.getAttribute("cx"))*scalingFactor);
+			}
+			if (element.hasAttribute("cy")) {
+				element.setAttribute("cy", Number(element.getAttribute("cy"))*scalingFactor);
+			}
 			if (element.hasAttribute("r")) {
 				element.setAttribute("r", Number(element.getAttribute("r"))*scalingFactor);
+			}
+			if (element.hasAttribute("rx")) {
+				element.setAttribute("rx", Number(element.getAttribute("rx"))*scalingFactor);
+			}
+			if (element.hasAttribute("ry")) {
+				element.setAttribute("ry", Number(element.getAttribute("ry"))*scalingFactor);
 			}
 			// Change the coordinates that might have been saved along with the 'origin' parameter
 			if (element.hasAttributeNS(laser_NS,"originX")) {
@@ -185,13 +197,38 @@ function scale(scalingFactor) {
 					element.setAttribute("height", Number(element.getAttribute("height"))*scalingFactor);
 				}
 			}
-			if (element.hasAttributeNS(laser_NS,'template')) {
-				useTemplateWithThickness(element, Number(materialThickness) / this.scalingFactor);
+			// Paths that are based on a template can be generated from that template directly
+			// all others need to be scaled
+			
+			// Scale paths
+			if (element.tagName == "path") {
+				if (element.hasAttributeNS(laser_NS,'template')) {
+					useTemplateWithThickness(element, Number(materialThickness) / this.scalingFactor);
+					scalePath(element, this.scalingFactor);
+				}
+				else {
+					scalePath(element, scalingFactor);
+				}
 			}
-			scalePath(element);
+		}
+	}
+
+	// Check wether groups have transforms that need to be scaled
+	var elements = laserSvgRoot.getElementsByTagName('g');
+	for (let element of elements) {
+		let transforms = element.transform.baseVal; // An SVGTransformList
+		for (let t=0; t<transforms.numberOfItems; t++) {
+			let transform = transforms.getItem(t);       // An SVGTransform
+			if (transform.type == SVGTransform.SVG_TRANSFORM_TRANSLATE){
+				var firstX = transform.matrix.e,
+					firstY = transform.matrix.f;
+
+				transform.setTranslate(firstX * scalingFactor, firstY * scalingFactor);
+			}
 
 		}
 	}
+
 	// Scale the SVG viewbox if defined to avoid clipping
 	var vBoxValues = laserSvgRoot.getAttribute("viewBox").replace(/,/g,"").split(" ").map(Number);
 	vBoxValues[2] *= scalingFactor;
@@ -233,13 +270,25 @@ function useTemplateWithThickness(path, thickness) {
 	path.setAttribute("d",newTemplate);
 }
 
-function scalePath(pathToScale) {
+function scalePath(pathToScale, factor) {
 	if (pathToScale.hasAttribute("d")) {
 		var newPathData = [];
+		// Some commands, such as arcs have parameters that do not scale (angle of opening for example)
 		for (let segment of pathToScale.getPathData({normalize: false})) {
-			if (segment.values.length>1) {
-				segment.values[0] *= this.scalingFactor;
-				segment.values[1] *= this.scalingFactor;
+			switch(segment.type) {
+				case 'a': 
+					if (segment.values.length == 7) {
+						segment.values[0] *= factor;
+						segment.values[1] *= factor;
+						segment.values[5] *= factor;
+						segment.values[6] *= factor;
+					}
+				break;
+
+				default: for (let s=0; s<segment.values.length; s++) {
+					segment.values[s] *= factor;
+					}
+					break;
 			}
 			newPathData.push(segment);
 		}
@@ -301,14 +350,15 @@ function applyKerfMaskToPath(path) {
 	for (let i=0; i<kerfMaskArray.length; i++) {
 		let setting = kerfMaskArray[i]
 		switch(setting) {
-			case 's':  changePathSegmentLength(pathData[i], kerf/2); break;
-			case 'g': changePathSegmentLength(pathData[i], -kerf/2); break;
-			case 'S':  changePathSegmentLength(pathData[i], kerf); break;
-			case 'G': changePathSegmentLength(pathData[i], -kerf); break;
+			case 's':  changePathSegmentLength(pathData[i], -kerf/2); break;
+			case 'g': changePathSegmentLength(pathData[i], kerf/2); break;
+			case 'S':  changePathSegmentLength(pathData[i], -kerf); break;
+			case 'G': changePathSegmentLength(pathData[i], kerf); break;
 			default: break; //nothing to do
 		}
 	}
 	console.log(pathData);
+	path.setPathData(pathData);
 
 }
 
@@ -455,7 +505,6 @@ function svgLoaded(event) {
 		parentDocument = window.parent; //We need this pointer in edit mode
 		window.parent.svgDidLoad(this);
 		// Add the event handlers for editing
-		addEditEventHandlers();
 	}
 	else {
 		addMiniEditMenu();
@@ -496,6 +545,8 @@ function checkURLParameters() {
 // means it's safe to run the script.
 document.addEventListener("DOMContentLoaded", function(e) {
       svgLoaded(document);
+      		addEditEventHandlers(laserSvgRoot);
+
 });
 
 // If we get loaded in an editor, it's a bit more tricky. 

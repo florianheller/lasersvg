@@ -16,7 +16,7 @@ svg {
 	}
 
 	[laser|action=engrave] {
-		stroke: #000;
+		stroke: #F00;
 		stroke-width:0.1;
 		fill: #000;
 	}
@@ -64,7 +64,7 @@ svg {
 	#editMenu button {
 		padding:0.1mm;
 		font-size: 1mm;	
-		margin: 1px;
+		margin: 0px;
 		font-family: "Menlo";
   		text-transform: capitalize;
 	}
@@ -87,7 +87,7 @@ svg {
 
 	#editMenu > button:not(:first-child) {
 		opacity: 0;
-		transition: 1s
+		transition: 0.5s
 	}
 
 	#editMenu > select {
@@ -95,11 +95,6 @@ svg {
 		margin: 1px;
 		opacity: 0;
 		transition: 1s
-	}
-
-	#editMenu rect {
-		stroke: #384C6C;
-		fill: #E1E4E9;
 	}
 
 }

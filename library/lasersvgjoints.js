@@ -390,6 +390,18 @@ function replacePrimitive(rect) {
 	transferAttributes(rect, pathTop, "top");
 	laserSvgRoot.appendChild(pathTop);	
 	pathTop.setAttributeNS(laser_NS,"laser:template",pathTop.getAttribute("d"));
+	pathTop.onclick = function (event) {
+				let segmentIndex = isInWhichSegment(this, event.clientX, event.clientY);
+				highlightPathSegment(this, segmentIndex, "pathTemplate");
+				// clear selection by removing the selected class from all other tags
+				for (let e of laserSvgRoot.querySelectorAll('.selected')) {
+					e.classList.remove("selected");
+					if (e.getAttribute("class") == "" ) { e.removeAttribute("class"); } // Leave a clean DOM
+				}
+				currentSelection = this;
+				this.classList.add("selected");
+				parentDocument.didSelectElement(this, segmentIndex); //Notify the host script
+			}
 	// Right
 	let pathRight = document.createElementNS("http://www.w3.org/2000/svg", "path");
 	pathData = [
@@ -400,6 +412,18 @@ function replacePrimitive(rect) {
 	transferAttributes(rect, pathRight, "right");
 	laserSvgRoot.appendChild(pathRight);	
 	pathRight.setAttributeNS(laser_NS,"template",pathRight.getAttribute("d"));
+	pathRight.onclick = function (event) {
+				let segmentIndex = isInWhichSegment(this, event.clientX, event.clientY);
+				highlightPathSegment(this, segmentIndex, "pathTemplate");
+				// clear selection by removing the selected class from all other tags
+				for (let e of laserSvgRoot.querySelectorAll('.selected')) {
+					e.classList.remove("selected");
+					if (e.getAttribute("class") == "" ) { e.removeAttribute("class"); } // Leave a clean DOM
+				}
+				currentSelection = this;
+				this.classList.add("selected");
+				parentDocument.didSelectElement(this, segmentIndex); //Notify the host script
+			}
 	// Bottom
 	let pathBottom = document.createElementNS("http://www.w3.org/2000/svg", "path");
 	pathData = [
@@ -410,6 +434,18 @@ function replacePrimitive(rect) {
 	transferAttributes(rect, pathBottom, "bottom");
 	laserSvgRoot.appendChild(pathBottom);
 	pathBottom.setAttributeNS(laser_NS,"laser:template",pathBottom.getAttribute("d"));
+	pathBottom.onclick = function (event) {
+				let segmentIndex = isInWhichSegment(this, event.clientX, event.clientY);
+				highlightPathSegment(this, segmentIndex, "pathTemplate");
+				// clear selection by removing the selected class from all other tags
+				for (let e of laserSvgRoot.querySelectorAll('.selected')) {
+					e.classList.remove("selected");
+					if (e.getAttribute("class") == "" ) { e.removeAttribute("class"); } // Leave a clean DOM
+				}
+				currentSelection = this;
+				this.classList.add("selected");
+				parentDocument.didSelectElement(this, segmentIndex); //Notify the host script
+			}
 	// Left
 	let pathLeft = document.createElementNS("http://www.w3.org/2000/svg", "path");
 	pathData = [
@@ -420,6 +456,18 @@ function replacePrimitive(rect) {
 	transferAttributes(rect, pathLeft, "left");
 	laserSvgRoot.appendChild(pathLeft);
 	pathLeft.setAttributeNS(laser_NS,"laser:template",pathLeft.getAttribute("d"));
+	pathLeft.onclick = function (event) {
+				let segmentIndex = isInWhichSegment(this, event.clientX, event.clientY);
+				highlightPathSegment(this, segmentIndex, "pathTemplate");
+				// clear selection by removing the selected class from all other tags
+				for (let e of laserSvgRoot.querySelectorAll('.selected')) {
+					e.classList.remove("selected");
+					if (e.getAttribute("class") == "" ) { e.removeAttribute("class"); } // Leave a clean DOM
+				}
+				currentSelection = this;
+				this.classList.add("selected");
+				parentDocument.didSelectElement(this, segmentIndex); //Notify the host script
+			}
 
 	// Remove the original rect
 	rect.parentNode.removeChild(rect);
