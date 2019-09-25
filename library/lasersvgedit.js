@@ -118,8 +118,12 @@ function createMenuButton(item, index, array) {
 	let elements = laserSvgRoot.querySelectorAll('[*|joint]');
 	if (elements.length > 0) {
 		menuItems.push("jointSelection");
-	//	buttons.push({ id:"joints", title:"Joints", x:108, y:0, width:30, textXOffset:7, height:10,  textYOffset:7, onclick:"setJointsClicked(this)", fontSize:5})	
 		createJointSelection(document.getElementById("editMenu"));
+		// Select the joint type of the first element in the list
+		if (elements[0].hasAttributeNS(laser_NS,"joint-type")) {
+			let type = elements[0].getAttributeNS(laser_NS,"joint-type");
+			laserSvgRoot.getElementById("jointSelection").value = type;
+		}
 	}
 
  	// We also need to adjust the viewbox to shift everythin accordingly
