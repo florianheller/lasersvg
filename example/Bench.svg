@@ -8,11 +8,18 @@
     http://www.heller-web.net/lasersvg
 -->
 <?xml-stylesheet type="text/css" href="http://www2.heller-web.net/LaserSVG2/lasersvg.css"?>
-<svg width="270mm" height="100mm" version="1.1" viewBox="-5, -5, 270, 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:laser="http://www.heller-web.net/lasersvg" laser:material-thickness="3" laser:kerf="0.2">
+<svg width="270mm" height="100mm" version="1.1" viewBox="-5, -5, 270, 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:laser="http://www.heller-web.net/lasersvg" laser:material-thickness="3" laser:kerf="0.2" laser:action="cut">
 	<script type="text/javascript" xlink:href="http://www2.heller-web.net/LaserSVG2/lasersvg.js" />
      
 	<path id="benchPlank" d="m 55 0 l 150 0 l 0 5 l 3 0 l 0 5 l -3 0 l 0 5 l 3 0 l 0 5 l -3 0 l 0 5 l -150 0 l 0 -5 l -3 0 l 0 -5 l 3 0 l 0 -5 l -3 0 l 0 -5 l 3 0 z" laser:template="m 55 0 l 150 0 l 0 5 l {thickness} 0 l 0 5 l -{thickness} 0 l 0 5 l {thickness} 0 l 0 5 l -{thickness} 0 l 0 5 l -150 0 l 0 -5 l -{thickness} 0 l 0 -5 l {thickness} 0 l 0 -5 l -{thickness} 0 l 0 -5 l {thickness} 0 z" laser:kerf-mask="i i g i s i g i s i i i g i s i g i s i"
            />
+    <g id="svgstar" transform="translate(133,12.5)">
+        <path id="svgbar" fill="#ffb13b" 
+         d="m-4.205,-0.79 a1.12,1.12 0 1 0 0,1.58 h8.41 a1.12,1.12 0 1 0 0,-1.58 Z" laser:action="engrave"/>
+         <use xlink:href="#svgbar" transform="rotate(45)"/>
+         <use xlink:href="#svgbar" transform="rotate(90)"/>
+         <use xlink:href="#svgbar" transform="rotate(135)"/>
+     </g>
     <path id="benchPlank2" d="m 55 25 
             l 150 0 l 0 5 l 3 0 l 0 5 l -3 0 l 0 5 l 3 0 l 0 5 l -3 0 l 0 5 
             l -150 0 l 0 -5 l -3 0 l 0 -5 l 3 0 l 0 -5 l -3 0 l 0 -5 l 3 0 z" laser:template="m 55 25 
@@ -22,8 +29,8 @@
      <g id="benchSide">
             <rect x="0" y="0" width="50" height="50"/>
             <g>
-                <rect x="15" y="30" width="5" height="3" laser:thickness-adjust="height" laser:origin="bottom" laser:kerf-adjust="shrink" laser:action="cut"/>
-                <rect x="25" y="30" width="5" height="3" laser:thickness-adjust="height" laser:origin="bottom" laser:kerf-adjust="shrink" laser:action="engrave"/>
+                <rect x="23" y="25" width="5" height="3" laser:thickness-adjust="height" laser:kerf-adjust="shrink" />
+                <rect x="33" y="25" width="5" height="3" laser:thickness-adjust="height" laser:kerf-adjust="shrink" />
                 <rect x="40" y="5" width="3" height="5"  laser:thickness-adjust="width" laser:origin="right" laser:kerf-adjust="shrink" />
                 <rect x="40" y="15" width="3" height="5" laser:thickness-adjust="width" laser:origin="right" laser:kerf-adjust="shrink" />
             </g>
@@ -31,10 +38,10 @@
     <g id="benchSide2">
         <rect x="210" y="0" width="50" height="50"/>
         <g>
-            <rect x="225" y="30" width="5" height="3" laser:thickness-adjust="height" laser:kerf-adjust="shrink" />
-    	    <rect x="235" y="30" width="5" height="3" laser:thickness-adjust="height" laser:kerf-adjust="shrink" />
-            <rect x="250" y="5" width="3" height="5"  laser:thickness-adjust="width" laser:kerf-adjust="shrink" />
-            <rect x="250" y="15" width="3" height="5" laser:thickness-adjust="width" laser:kerf-adjust="shrink" />
+            <rect x="233" y="25" width="5" height="3" laser:thickness-adjust="height" laser:kerf-adjust="shrink" />
+    	    <rect x="243" y="25" width="5" height="3" laser:thickness-adjust="height" laser:kerf-adjust="shrink" />
+            <rect x="250" y="5" width="3" height="5"  laser:thickness-adjust="width" laser:origin="right" laser:kerf-adjust="shrink" />
+            <rect x="250" y="15" width="3" height="5" laser:thickness-adjust="width" laser:origin="right" laser:kerf-adjust="shrink" />
         </g>
     </g> 
 </svg>
