@@ -337,7 +337,6 @@ function createTSlotPath(path, gap, inset, fingers) {
 }
 
 function createJoints() {
-	// TODO: replace all rects by 4 equivalent paths
 	// TODO: replace composed paths by equivalent 1-stop paths
 
 	// First transorm all primitives with joints assigned into path segments 
@@ -364,8 +363,6 @@ function createJoints() {
 				default: break;
 			}
 		}
-		//createFingerJointPath(path, 5, materialThickness * direction, numberOfFingers);
-		//createFlapJointPath(path, 5, materialThickness, 1);
 	}
 }
 
