@@ -12,25 +12,28 @@
 <script type="text/javascript" xlink:href="lasersvg.js" />
 <script type="text/javascript" xlink:href="http://www2.heller-web.net/LaserSVG2/path-data-polyfill.js" />
 <script type="text/javascript"><![CDATA[
-		function triangleHeight(length, thickness) {
+		function triangleRadius(length, thickness) {
 			// Calculate the middle points of the thickness edges
+			// (0,0) is at the center of the top thickness edge
 			let x1 = 0;
 			let y1 = 0;
-			let x2 = 0.5 * thickness + 17.3 - Math.cos(Math.PI/3)*0.5*thickness;
-			let y2 = 20 + Math.sin(Math.PI/6)*20 + Math.sin(Math.PI/3)*0.5*thickness;
-			let x3 = - 0.5*thickness - 17.3 + Math.cos(Math.PI/3)*0.5*thickness;
-			let y3 = 20 + Math.sin(Math.PI/6)*20 + Math.sin(Math.PI/3)*0.5*thickness;
+			// Bottom right
+			let x2 = Math.cos(Math.PI/6)*length + Math.cos(Math.PI/3)*0.5*thickness;
+			let y2 = length + Math.sin(Math.PI/6)*20 + Math.sin(Math.PI/3)*0.5*thickness;
+			// Bottom Left
+			let x3 = -x2;
+			let y3 = y2;
 			let a = Math.hypot(x2-x1, y2-y1);
 			let b = Math.hypot(x3-x2, y3-y2);
 			let c = Math.hypot(x1-x3, y1-y3);
-			let g = (17.3 * 2) + Math.cos(Math.PI/3)*thickness;
-			let h = 20 + 10 + Math.sin(Math.PI/3)*0.5*thickness;
-			let A = 0.5 * g * h;
+			
+			let A = ((a*a)*Math.sqrt(3))/4;
+
 			let R = (a * b * c)/(4*A);
-			return 25-R
+			return R
 		}
 	]]></script>
 
 <circle cx="25" cy="25" r="25" stroke="#384C6C" stroke-width="0.5" fill="#E1E4E9" />
-<path d="M 22.5 3.57 h 5 v 20 l 17.3 10 l -2.5 4.33 l -17.3 -10 l -17.3 10 l -2.5 -4.33 l 17.3 -10 v -20 z" laser:template="M{25-0.5*thickness},{triangleHeight(20, thickness)} l{thickness},0 l0,20 l{Math.cos(Math.PI/6)*20},{Math.sin(Math.PI/6)*20} l{-Math.sin(Math.PI/6)*thickness},{Math.cos(Math.PI/6)*thickness} l-{Math.cos(Math.PI/6)*20},-10 l-{Math.cos(Math.PI/6)*20},10 l{-Math.sin(Math.PI/6)*thickness},{-Math.cos(Math.PI/6)*thickness} l{Math.cos(Math.PI/6)*20},-10 l0,-20 z" stroke="#384C6C" stroke-width="0.5" fill="#E1E4E9"/>
+<path d="M 22.5 3.57 h 5 v 20 l 17.3 10 l -2.5 4.33 l -17.3 -10 l -17.3 10 l -2.5 -4.33 l 17.3 -10 v -20 z" laser:template="M{25-0.5*thickness},{25-triangleRadius(20, thickness)} h {thickness}  l0,20 l{Math.cos(Math.PI/6)*20},{Math.sin(Math.PI/6)*20} l{-Math.sin(Math.PI/6)*thickness},{Math.cos(Math.PI/6)*thickness} l-{Math.cos(Math.PI/6)*20},-10 l-{Math.cos(Math.PI/6)*20},10 l{-Math.sin(Math.PI/6)*thickness},{-Math.cos(Math.PI/6)*thickness} l{Math.cos(Math.PI/6)*20},-10 l0,-20 z" stroke="#384C6C" stroke-width="0.5" fill="#E1E4E9"/>
 </svg>

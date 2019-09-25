@@ -1,0 +1,34 @@
+<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="600mm" height="300mm" viewBox="0 0 600 300" version="1.1" xml:space="preserve"  xmlns:laser="http://www.heller-web.net/lasersvg" xmlns:xlink="http://www.w3.org/1999/xlink" laser:material-thickness="3" laser:action="cut">
+    <script type="text/javascript"><![CDATA[
+		function triangleRadius(length, thickness) {
+			// Calculate the middle points of the thickness edges
+			// (0,0) is at the center of the top thickness edge
+			let x = (0.5 * thickness) + (Math.cos(Math.PI/6)*length) - Math.cos(Math.PI/3)*0.5*thickness;
+			let y = length + Math.sin(Math.PI/6)*length + Math.sin(Math.PI/3)*0.5*thickness;
+			
+			let a = Math.sqrt(x*x + y*y)
+
+			let A = ((a*a)*Math.sqrt(3))/4;
+			let R = (a * a * a)/(4*A);
+			return R
+		}
+	]]></script>
+
+	<path d="m 139.5 69.63397459621555 h 3 v 11 l 2.598076211353316 -1.5 a 3 3 0 1 1 1.5 2.598076211353316 l -2.598076211353316 1.5 l 9.526279441628827 5.5 l -1.5 2.598076211353316 l -9.526279441628827 -5.5 v 3 a 3 3 0 1 1 -3 0 v -3 l -9.526279441628827 5.5 l -1.5 -2.598076211353316 l 9.526279441628827 -5.5 l -2.598076211353316 -1.5 a 3 3 0 1 1 1.5 -2.598076211353316 l 2.598076211353316 1.5 Z" id="path1920" laser:template="m {141-0.5*thickness} {83-triangleRadius(12.5, thickness)} l {thickness} 0 l 0 {12.5 - Math.sin(Math.PI/6)*thickness} l {Math.cos(Math.PI/6)*3} -{Math.sin(Math.PI/6)*3} a {thickness} {thickness}  0  1  1  {Math.sin(Math.PI/6)*thickness} {Math.cos(Math.PI/6)*thickness} l {-Math.cos(Math.PI/6)*3} {Math.sin(Math.PI/6)*3} l {Math.cos(Math.PI/6)*(12.5-0.5*thickness)} {Math.sin(Math.PI/6)*(12.5-0.5*thickness)} l {-Math.sin(Math.PI/6)*thickness} {Math.cos(Math.PI/6)*thickness}  l {-Math.cos(Math.PI/6)*(12.5-0.5*thickness)} {-Math.sin(Math.PI/6)*(12.5-0.5*thickness)} l 0 3 a {thickness} {thickness}  0  1  1  {-thickness} 0 l 0 -3 l {-Math.cos(Math.PI/6)*(12.5-0.5*thickness)} {Math.sin(Math.PI/6)*(12.5-0.5*thickness)} l {-Math.sin(Math.PI/6)*thickness} {-Math.cos(Math.PI/6)*thickness} l {Math.cos(Math.PI/6)*(12.5-0.5*thickness)} {-Math.sin(Math.PI/6)*(12.5-0.5*thickness)} l {-Math.cos(Math.PI/6)*3} -{Math.sin(Math.PI/6)*3} a {thickness} {thickness}  0  1  1  {Math.sin(Math.PI/6)*thickness} {-Math.cos(Math.PI/6)*thickness} l {Math.cos(Math.PI/6)*3} {Math.sin(Math.PI/6)*3} z"/>
+	<circle id="path4532" cx="141" cy="83" r="16"/>
+
+	<path d="M 22.5 22.13397459621556 h 3 l 0 9 l 7.794228634059948 4.5 l -1.5 2.598076211353316 l -7.794228634059948 -4.5 l -7.794228634059948 4.5 l -1.5 -2.598076211353316 l 7.794228634059948 -4.5 Z" id="path1926" laser:template="M {24-0.5*thickness}, {32-triangleRadius(9, thickness)} l {thickness} 0 l 0 9 l{Math.cos(Math.PI/6)*9},{Math.sin(Math.PI/6)*9} l {-Math.sin(Math.PI/6)*thickness} {Math.cos(Math.PI/6)*thickness} l -{Math.cos(Math.PI/6)*9},-{Math.sin(Math.PI/6)*9} l -{Math.cos(Math.PI/6)*9},{Math.sin(Math.PI/6)*9} l {-Math.sin(Math.PI/6)*thickness} {-Math.cos(Math.PI/6)*thickness} l {Math.cos(Math.PI/6)*9} -{Math.sin(Math.PI/6)*9} z"/>
+	<circle id="path835" cx="24" cy="32" r="12.5"/>
+
+	<path d="M 139.5 33.63397459621556 h 3 l 0 12.5 l 10.825317547305485 6.25 l -1.5 2.598076211353316 l -10.825317547305485 -6.25 l -10.825317547305485 6.25 l -1.5 -2.598076211353316 l 10.825317547305485 -6.25 Z" id="path1936" laser:template="M {141-0.5*thickness}, {47-triangleRadius(12.5, thickness)} l {thickness} 0 l 0 12.5 l{Math.cos(Math.PI/6)*12.5},{Math.sin(Math.PI/6)*12.5} l {-Math.sin(Math.PI/6)*thickness} {Math.cos(Math.PI/6)*thickness} l -{Math.cos(Math.PI/6)*12.5},-{Math.sin(Math.PI/6)*12.5} l -{Math.cos(Math.PI/6)*12.5},{Math.sin(Math.PI/6)*12.5} l {-Math.sin(Math.PI/6)*thickness} {-Math.cos(Math.PI/6)*thickness} l {Math.cos(Math.PI/6)*12.5} -{Math.sin(Math.PI/6)*12.5} z"/>
+	<circle id="path4526" cx="141" cy="47" r="15.5"/>
+
+	<path d="M4.4915783,96.933757h27.982v2.57405h14.382v-2.57405h28.661826v2.57405h14.381v-2.57405h14.35058l0.0385,-4.017559c-0.75648,-0.445187,-1.51464,-0.876985,-2.28367,-1.29874c0.16736,-0.10795,0.33221,-0.215899,0.4887,-0.328033l21.91038,-15.701201c2.83681,-2.033466,2.30711,-3.671954,-1.18409,-3.666096l-12.33385,0.02259c-3.48869,0.0059,-8.58073,1.647693,-11.417536,3.681995l-14.35,11.264c-5.712114,-0.961503,-16.369818,-2.490368,-26.127107,-2.490368c-29.534627,0,-50.5194919,8.456038,-54.4985577,12.533011z" id="path1932"/>
+
+	<path d="m126.93635,61.006684h-14.46774v2.57405h-28.575v-2.57405h-14.38v2.57405h-28.576v-2.57405h-14.468v1.779073h-0.03849v4.811699c0.756483,0.445187,1.514639,0.877822,2.283674,1.297904c-0.167363,0.109623,-0.332216,0.217572,-0.488701,0.329706l-21.91,15.701c-2.8368103,2.033466,-2.307105,3.671954,1.1832596,3.666096l12.3346856,-0.02259c3.488691,-0.0067,8.580724,-1.64853,11.417534,-3.681995l14.349,-11.264c5.712114,0.961503,16.369818,2.489531,26.127106,2.489531c29.534623,0,50.519493,-8.456038,54.498563,-12.532174h0.70962v-0.901252c0,-0.279497,3.05271,-0.123013,3.07781,-0.924683c0.0234,-0.801671,-3.07781,-0.468618,-3.07781,-0.748115z" id="path1922"/>
+	
+	<path d="m8.279013,57.523851h13.640121v2.572376h14.373172v-2.572376h28.669358v2.572376h14.373172v-2.572376h28.700324l0.0385,-4.018396c-0.75648,-0.445187,-1.51464,-0.876985,-2.28284,-1.297904c0.1682,-0.108786,0.33306,-0.217572,0.48787,-0.328869l21.91206,-15.701201c2.83597,-2.033466,2.30543,-3.671954,-1.1841,-3.666097l-12.33385,0.02259c-3.49036,0.0067,-8.58156,1.64853,-11.41753,3.681996l-14.351,11.264c-5.711,-0.961,-16.369,-2.49,-26.126,-2.49c-29.5363,0,-50.521165,8.456037,-54.499394,12.533848z" id="path1930"/>
+	<script type="text/javascript" xlink:href="http://www2.heller-web.net/LaserSVG2/lasersvg.js"/>
+</svg>
+
+
