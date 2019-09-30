@@ -245,7 +245,7 @@ function createTSlotPath(path, gap, inset, fingers) {
 
     let newPathData = []; 
 	
-	if (inset < 0) {
+	if (inset > 0) {
 
 		//The first element of the first path segment list, as this determines the origin
 
@@ -260,17 +260,17 @@ function createTSlotPath(path, gap, inset, fingers) {
 			if (i%2 != 0) {
 			 	newPathData.push({type: "l", values: [(cos * (fingerSize-2)/2), (sin * (fingerSize-2)/2)]});
 
-				newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * -inset/2), (Math.sin(alpha+(Math.PI/2)) * -inset/2)]});
+				newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * inset/2), (Math.sin(alpha+(Math.PI/2)) * inset/2)]});
 		 		newPathData.push({type: "l", values: [(cos * -2), (sin * -2)]}); //Todo: nut size
 		 		newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * 2), (Math.sin(alpha+(Math.PI/2)) * 2)]});
 		 		newPathData.push({type: "l", values: [(cos * 2), (sin * 2)]}); //Todo: nut size
-		 		newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * -inset/2), (Math.sin(alpha+(Math.PI/2)) * -inset/2)]});
+		 		newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * inset/2), (Math.sin(alpha+(Math.PI/2)) * inset/2)]});
 		 		newPathData.push({type: "l", values: [(cos * 2), (sin * 2)]}); //Todo: bolt diameter
-		 		newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * -inset/2), (Math.sin(alpha-(Math.PI/2)) * -inset/2)]});
+		 		newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * inset/2), (Math.sin(alpha-(Math.PI/2)) * inset/2)]});
 		 		newPathData.push({type: "l", values: [(cos * 2), (sin * 2)]}); //Todo: nut size
 		 		newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * 2), (Math.sin(alpha-(Math.PI/2)) * 2)]});
 				newPathData.push({type: "l", values: [(cos * -2), (sin * -2)]}); //Todo: nut size
-		 		newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * -inset/2), (Math.sin(alpha-(Math.PI/2)) * -inset/2)]});
+		 		newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * inset/2), (Math.sin(alpha-(Math.PI/2)) * inset/2)]});
 				newPathData.push({type: "l", values: [(cos * (fingerSize-2)/2), (sin * (fingerSize-2)/2)]});
 		 		//newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * -inset/2), (Math.sin(alpha-(Math.PI/2)) * -inset/2)]});
 		 		if (i != fingers-1) {
@@ -279,9 +279,9 @@ function createTSlotPath(path, gap, inset, fingers) {
 
 			}
 			else {
-		 		newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * inset), (Math.sin(alpha+(Math.PI/2)) * inset)]});
+		 		newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * -inset), (Math.sin(alpha+(Math.PI/2)) * -inset)]});
 		 		newPathData.push({type: "l", values: [(cos * fingerSize), (sin * fingerSize)]});
-		 		newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * inset), (Math.sin(alpha-(Math.PI/2)) * inset)]});
+		 		newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * -inset), (Math.sin(alpha-(Math.PI/2)) * -inset)]});
 
 				if (i != fingers-1) {
 					newPathData.push({type: "l", values: [cos * fingerSize, sin * fingerSize]});
@@ -304,22 +304,22 @@ function createTSlotPath(path, gap, inset, fingers) {
 		for (let i = 0; i < fingers; i += 1) {
 
 			if (i%2 == 0) {
-				newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * inset), (Math.sin(alpha+(Math.PI/2)) * inset)]});
+				newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * -inset), (Math.sin(alpha+(Math.PI/2)) * -inset)]});
  				newPathData.push({type: "l", values: [(cos * fingerSize), (sin * fingerSize)]});
- 				newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * inset), (Math.sin(alpha-(Math.PI/2)) * inset)]});
+ 				newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * -inset), (Math.sin(alpha-(Math.PI/2)) * -inset)]});
 
  				// This draws the segments which spans 3 fingers and creates the holes for the screws. 
  				// Since adding circles makes it more complicated to remove the elements from the DOM if we want to change the joint-type,
  				// we will jump back and forth in a single path and create a circle using two arcs
  				// The pattern is a follows: jump to (1.5*fingersize) - hole radius, create two arcs, jump back the same distance
 				if (i != fingers-1) {
-					newPathData.push({type: "m", values: [cos * ((1.5 * fingerSize) + inset/2), sin * ((1.5 * fingerSize) - inset/2)]});
-					newPathData.push({type: "m", values: [sin * inset*0.75, cos * inset*0.75]});
-					newPathData.push({type: "a", values: [inset/2, inset/2, 0, 0, 0, -cos * inset, -sin * inset]});
-					newPathData.push({type: "a", values: [inset/2, inset/2, 0, 0, 0, cos * inset, sin * inset]});
+					newPathData.push({type: "m", values: [cos * ((1.5 * fingerSize) - inset/2), sin * ((1.5 * fingerSize) + inset/2)]});
+					newPathData.push({type: "m", values: [sin * inset*0.75, cos * -inset*0.75]});
+					newPathData.push({type: "a", values: [-inset/2, -inset/2, 0, 0, 0, -cos * -inset, -sin * -inset]});
+					newPathData.push({type: "a", values: [-inset/2, -inset/2, 0, 0, 0, cos * -inset, sin * -inset]});
 
-					newPathData.push({type: "m", values: [sin * -inset*0.75, cos * -inset*0.75]});
-					newPathData.push({type: "m", values: [-cos * ((1.5 * fingerSize) + inset/2), -sin * ((1.5 * fingerSize) - inset/2)]});
+					newPathData.push({type: "m", values: [sin * inset*0.75, cos * inset*0.75]});
+					newPathData.push({type: "m", values: [-cos * ((1.5 * fingerSize) - inset/2), -sin * ((1.5 * fingerSize) + inset/2)]});
 					
 					newPathData.push({type: "l", values: [cos * 3 * fingerSize, sin * 3 * fingerSize]});
 				}
