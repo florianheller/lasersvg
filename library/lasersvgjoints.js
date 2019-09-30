@@ -271,13 +271,13 @@ function createTSlotPath(path, gap, inset, fingers) {
 		for (let i = 0; i < fingers; i += 1) {
 
 			if (i%2 == 0) {
-				newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * inset), (Math.sin(alpha+(Math.PI/2)) * inset)]});
+				newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * inset), (Math.sin(alpha-(Math.PI/2)) * inset)]});
  				newPathData.push({type: "l", values: [(cos * fingerSize), (sin * fingerSize)]});
- 				newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * inset), (Math.sin(alpha-(Math.PI/2)) * inset)]});
+ 				newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * inset), (Math.sin(alpha+(Math.PI/2)) * inset)]});
 
- 				newTemplate.push({type: "l", values: ["{" + Math.cos(alpha+(Math.PI/2)) + "* thickness}", "{" + Math.sin(alpha+(Math.PI/2)) + "* thickness}"]});
- 				newTemplate.push({type: "l", values: [(cos * fingerSize), (sin * fingerSize)]});
  				newTemplate.push({type: "l", values: ["{" + Math.cos(alpha-(Math.PI/2)) + "* thickness}", "{" + Math.sin(alpha-(Math.PI/2)) + "* thickness}"]});
+ 				newTemplate.push({type: "l", values: [(cos * fingerSize), (sin * fingerSize)]});
+ 				newTemplate.push({type: "l", values: ["{" + Math.cos(alpha+(Math.PI/2)) + "* thickness}", "{" + Math.sin(alpha+(Math.PI/2)) + "* thickness}"]});
 
  				// This draws the segments which spans 3 fingers and creates the holes for the screws. 
  				// Since adding circles makes it more complicated to remove the elements from the DOM if we want to change the joint-type,
@@ -309,10 +309,12 @@ function createTSlotPath(path, gap, inset, fingers) {
 			// We need to shift everything by inset/2 because we work with arcs and therefore need the starting point on the outline of the circle
 			// finally, we need to shift everything by inset perpendicular to the path such that the holes are not centered on the path itself
 			else {
-				let x = -(cos * gap)-(cos * 2.5 * fingerSize)-(cos * inset/2)+(Math.cos(alpha-(Math.PI/2)) * -0.75*inset);
-				let y = -(sin * gap)-(sin * 2.5 * fingerSize)-(sin * inset/2)+(Math.sin(alpha-(Math.PI/2)) * -0.75*inset);
+				let x = -(cos * gap)-(cos * 2.5 * fingerSize)-(cos * inset/2)+(Math.cos(alpha+(Math.PI/2)) * -0.75*inset);
+				let y = -(sin * gap)-(sin * 2.5 * fingerSize)-(sin * inset/2)+(Math.sin(alpha+(Math.PI/2)) * -0.75*inset);
+				let templateX = "{ (" + (-(cos * gap)-(cos * 2.5 * fingerSize))+") + " + (-cos/2 + (Math.cos(alpha+(Math.PI/2)) * -0.75))  + "* thickness}";
+				let templateY = "{ (" + (-(sin * gap)-(sin * 2.5 * fingerSize))+") + " + (-sin/2 + (Math.sin(alpha+(Math.PI/2)) * -0.75))  + "* thickness}";
 				newPathData.push({type: "m", values: [x, y]});
-				newTemplate.push({type: "m", values: [x, y]}); //TODO: that's a hard one
+				newTemplate.push({type: "m", values: [templateX, templateY]});
 				moveBackDistance.push([x, y])
 
 			}
@@ -328,8 +330,6 @@ function createTSlotPath(path, gap, inset, fingers) {
 	}
 
 	else { //The inside direction of the t-slot joint
-		//The first element of the first path segment list, as this determines the origin
-
  	
 	 	//We are now at the point to add the first finger
 		for (let i = 0; i < fingers; i += 1) {
