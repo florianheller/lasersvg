@@ -247,8 +247,6 @@ function createTSlotPath(path, gap, inset, fingers) {
 	
 	if (inset < 0) {
 
-		let holeCoordinates = [];
-
 		newPathData.push(pathData[0]);
 	 	
 	 	newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
@@ -270,14 +268,12 @@ function createTSlotPath(path, gap, inset, fingers) {
  				// The problem is that we only have relative coordinates, so we need to keep track of more than just the 
 				if (i != fingers-1) {
 					newPathData.push({type: "l", values: [cos * 3 * fingerSize, sin * 3 * fingerSize]});
-					holeCoordinates.push([cos * 3 * fingerSize, sin * 3 * fingerSize]);
 				}
 			}
 		}
 		newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
-		for (let i = holeCoordinates.length-1; i>=0; i--) {
-			let hole = holeCoordinates[i];
-			if (i != holeCoordinates.length-1) {
+		for (let i = 0; i<Math.floor(fingers/2); i++) {
+			if (i != 0) {
 				newPathData.push({type: "m", values: [-(cos * 4 * fingerSize), -(sin * 4 * fingerSize)]});
 			}
 			// Only the first one is complicated to align
@@ -291,10 +287,7 @@ function createTSlotPath(path, gap, inset, fingers) {
 			newPathData.push({type: "a", values: [-inset/2, -inset/2, 0, 0, 0, -cos * -inset, -sin * -inset]});
 			newPathData.push({type: "a", values: [-inset/2, -inset/2, 0, 0, 0, cos * -inset, sin * -inset]});
 		}
-	
-
-	path.setPathData(newPathData);
-	
+		path.setPathData(newPathData);
 	}
 	else { //The inside direction of the t-slot joint
 		//The first element of the first path segment list, as this determines the origin
@@ -322,7 +315,6 @@ function createTSlotPath(path, gap, inset, fingers) {
 				newPathData.push({type: "l", values: [(cos * -2), (sin * -2)]}); //Todo: nut size
 		 		newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * inset/2), (Math.sin(alpha+(Math.PI/2)) * inset/2)]});
 				newPathData.push({type: "l", values: [(cos * (fingerSize-2)/2), (sin * (fingerSize-2)/2)]});
-		 		//newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * -inset/2), (Math.sin(alpha-(Math.PI/2)) * -inset/2)]});
 		 		if (i != fingers-1) {
 					newPathData.push({type: "l", values: [cos * fingerSize, sin * fingerSize]});
 				}
