@@ -308,26 +308,38 @@ function createTSlotPath(path, gap, inset, fingers) {
  				newPathData.push({type: "l", values: [(cos * fingerSize), (sin * fingerSize)]});
  				newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * inset), (Math.sin(alpha-(Math.PI/2)) * inset)]});
 
+ 				// This draws the segments which spans 3 fingers and creates the holes for the screws. 
+ 				// Since adding circles makes it more complicated to remove the elements from the DOM if we want to change the joint-type,
+ 				// we will jump back and forth in a single path and create a circle using two arcs
+ 				// The pattern is a follows: jump to (1.5*fingersize) - hole radius, create two arcs, jump back the same distance
 				if (i != fingers-1) {
+					newPathData.push({type: "m", values: [cos * ((1.5 * fingerSize) + inset/2), sin * ((1.5 * fingerSize) - inset/2)]});
+					newPathData.push({type: "m", values: [sin * inset*0.75, cos * inset*0.75]});
+					newPathData.push({type: "a", values: [inset/2, inset/2, 0, 0, 0, -cos * inset, -sin * inset]});
+					newPathData.push({type: "a", values: [inset/2, inset/2, 0, 0, 0, cos * inset, sin * inset]});
+
+					newPathData.push({type: "m", values: [sin * -inset*0.75, cos * -inset*0.75]});
+					newPathData.push({type: "m", values: [-cos * ((1.5 * fingerSize) + inset/2), -sin * ((1.5 * fingerSize) - inset/2)]});
+					
 					newPathData.push({type: "l", values: [cos * 3 * fingerSize, sin * 3 * fingerSize]});
 				}
 			}
 
-			else {
+			// else {
 
-				//The circles take absolute coordinates, so ew have to calculate them
-					let x = pathData[0].values[0];
-					let y = pathData[0].values[1];
+			// 	//The circles take absolute coordinates, so ew have to calculate them
+			// 		let x = pathData[0].values[0];
+			// 		let y = pathData[0].values[1];
 
-				let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-				//circle.setAttribute("cx", x+(2*i *fingerSize)+gap+0.5*fingerSize+(Math.cos(alpha+(Math.PI/2)) * inset));
-				circle.setAttribute("cx", x + Math.cos(alpha) * ((2* i *fingerSize)+gap+0.5*fingerSize) + (Math.cos(alpha+(Math.PI/2)) * inset));
-				circle.setAttribute("cy", y + Math.sin(alpha) * ((2* i *fingerSize)+gap+0.5*fingerSize) + (Math.sin(alpha+(Math.PI/2)) * inset));
-				circle.setAttribute("r",  2);
-				laserSvgRoot.appendChild(circle);	
-				//TODO: how do we remove the stuff? Maybe use arcs in the path instead of circles
+			// 	let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+			// 	//circle.setAttribute("cx", x+(2*i *fingerSize)+gap+0.5*fingerSize+(Math.cos(alpha+(Math.PI/2)) * inset));
+			// 	circle.setAttribute("cx", x + Math.cos(alpha) * ((2* i *fingerSize)+gap+0.5*fingerSize) + (Math.cos(alpha+(Math.PI/2)) * inset));
+			// 	circle.setAttribute("cy", y + Math.sin(alpha) * ((2* i *fingerSize)+gap+0.5*fingerSize) + (Math.sin(alpha+(Math.PI/2)) * inset));
+			// 	circle.setAttribute("r",  2);
+			// 	laserSvgRoot.appendChild(circle);	
+			// 	//TODO: how do we remove the stuff? Maybe use arcs in the path instead of circles
 
-			}
+			// }
 		}
 		newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
 
