@@ -180,7 +180,9 @@ function createFlapJointPath(path, gap, inset, flaps) {
 
 	//The first element of the first path segment list, as this determines the origin
 	let newPathData = []; 
+	let newTemplate = [];
 	newPathData.push(pathData[0]);
+ 	newTemplate.push(pathData[0]);
 
 	// There's no inside for a flap
 	// The inside is just a straight line between the endpoints
@@ -188,36 +190,51 @@ function createFlapJointPath(path, gap, inset, flaps) {
 	if (inset < 0) { 
 
 		newPathData.push({type: "l", values: [width, height]});
-
+		newTemplate.push({type: "l", values: [width, height]});
 	}
 	else {
 	 	
 	 	newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
-	 	
-		//We are now at the point to add the first finger
+	 	newTemplate.push({type: "l", values: [(cos * gap), (sin * gap)]});
+
+		//We are now at the point to add the first flap
 		for (let i = 0; i < flaps; i += 1) {
-			//newPathData.push({type: "l", values: [inset, inset]});
+
 			let stepX = (cos * inset) + (Math.cos(alpha+(Math.PI/2)) * inset);
 			let stepY = (sin * inset) + (Math.sin(alpha+(Math.PI/2)) * inset);
+		
+			let stepXTemplate = "{" + (cos+Math.cos(alpha+(Math.PI/2))) + "*thickness}";
+			let stepYTemplate = "{" + (sin+Math.sin(alpha+(Math.PI/2))) + "*thickness}";  
 
 			let stepX2 = (cos * inset) + (Math.cos(alpha-(Math.PI/2)) * inset);
 			let stepY2 = (sin * inset) + (Math.sin(alpha-(Math.PI/2)) * inset);
 
+			let stepX2Template = "{" + (cos+Math.cos(alpha-(Math.PI/2))) + "*thickness}";
+			let stepY2Template = "{" + (sin+Math.sin(alpha-(Math.PI/2))) + "*thickness}";  
+
 	 		newPathData.push({type: "l", values: [stepX, stepY]});
 	 		newPathData.push({type: "l", values: [(cos * (fingerSize-2*inset)) , (sin * (fingerSize - 2*inset))]});
-	 		//newPathData.push({type: "l", values: [inset, -inset]});
 	 		newPathData.push({type: "l", values: [stepX2, stepY2]});
 
-			//if (i != flaps-1) {
-			//	newPathData.push({type: "l", values: [cos * fingerSize, sin * fingerSize]});
-			//}
+			newTemplate.push({type: "l", values: [stepXTemplate, stepYTemplate]});
+	 		newTemplate.push({type: "l", values: ["{" + cos +" * (" + fingerSize + "-2*thickness)}" , "{" + sin +" * (" + fingerSize + "-2*thickness)}"]});
+	 		newTemplate.push({type: "l", values: [stepX2Template, stepY2Template]});
+
 		}
 
 		// Close the second gap
 		newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
+		newTemplate.push({type: "l", values: [(cos * gap), (sin * gap)]});
+
 		}
 
 	path.setPathData(newPathData);
+
+	//We need to convert the pathSegment list into a string that we can store as template
+	let tempTemplate = newTemplate.map(function (object) {return object.type + object.values.join(" ") }).join(" ");
+	path.setAttributeNS(laser_NS, "laser:template", tempTemplate);
+
+	updateThickness(materialThickness);
 	
 }
 
