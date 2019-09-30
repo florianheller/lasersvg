@@ -272,9 +272,11 @@ function createTSlotPath(path, gap, inset, fingers) {
 			}
 		}
 		newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
+		let moveBackDistance = [[0,0]]; //We need to make sure the endpoint of the path matches
 		for (let i = 0; i<Math.floor(fingers/2); i++) {
 			if (i != 0) {
 				newPathData.push({type: "m", values: [-(cos * 4 * fingerSize), -(sin * 4 * fingerSize)]});
+				moveBackDistance.push([-(cos * 4 * fingerSize),-(sin * 4 * fingerSize)])
 			}
 			// Only the first one is complicated to align
 			// First, we need to compensate for the gap at the end of the command
@@ -282,11 +284,16 @@ function createTSlotPath(path, gap, inset, fingers) {
 			// We need to shift everything by inset/2 because we work with arcs and therefore need the starting point on the outline of the circle
 			// finally, we need to shift everything by inset perpendicular to the path such that the holes are not centered on the path itself
 			else {
-				newPathData.push({type: "m", values: [-(cos * gap)-(cos * 2.5 * fingerSize)-(cos * inset/2)+(Math.cos(alpha-(Math.PI/2)) * -0.75*inset) , -(sin * gap)-(sin * 2.5 * fingerSize)-(sin * inset/2)+(Math.sin(alpha-(Math.PI/2)) * -0.75*inset) ]});
+				let x = -(cos * gap)-(cos * 2.5 * fingerSize)-(cos * inset/2)+(Math.cos(alpha-(Math.PI/2)) * -0.75*inset);
+				let y = -(sin * gap)-(sin * 2.5 * fingerSize)-(sin * inset/2)+(Math.sin(alpha-(Math.PI/2)) * -0.75*inset);
+				newPathData.push({type: "m", values: [x, y]});
+				moveBackDistance.push([x, y])
+
 			}
 			newPathData.push({type: "a", values: [-inset/2, -inset/2, 0, 0, 0, -cos * -inset, -sin * -inset]});
 			newPathData.push({type: "a", values: [-inset/2, -inset/2, 0, 0, 0, cos * -inset, sin * -inset]});
 		}
+		newPathData.push({type: "m", values: moveBackDistance.reduce((total, amount) => [total[0]-amount[0] , total[1]-amount[1]]) });
 		path.setPathData(newPathData);
 	}
 	else { //The inside direction of the t-slot joint
@@ -336,7 +343,6 @@ function createTSlotPath(path, gap, inset, fingers) {
 
 		path.setPathData(newPathData);
 	}
-		
 }
 
 function createJoints() {
