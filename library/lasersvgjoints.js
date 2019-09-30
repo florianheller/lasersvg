@@ -261,19 +261,23 @@ function createTSlotPath(path, gap, inset, fingers) {
 	let fingerSize = edgeLength / (2 * fingers - 1);
 
     let newPathData = []; 
-	
+	let newTemplate = [];
+	newPathData.push(pathData[0]);
+ 	newTemplate.push(pathData[0]);
+ 	newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
+ 	newTemplate.push({type: "l", values: [(cos * gap), (sin * gap)]});
+
 	if (inset < 0) {
-
-		newPathData.push(pathData[0]);
-	 	
-	 	newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
-
 		for (let i = 0; i < fingers; i += 1) {
 
 			if (i%2 == 0) {
 				newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * inset), (Math.sin(alpha+(Math.PI/2)) * inset)]});
  				newPathData.push({type: "l", values: [(cos * fingerSize), (sin * fingerSize)]});
  				newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * inset), (Math.sin(alpha-(Math.PI/2)) * inset)]});
+
+ 				newTemplate.push({type: "l", values: ["{" + Math.cos(alpha+(Math.PI/2)) + "* thickness}", "{" + Math.sin(alpha+(Math.PI/2)) + "* thickness}"]});
+ 				newTemplate.push({type: "l", values: [(cos * fingerSize), (sin * fingerSize)]});
+ 				newTemplate.push({type: "l", values: ["{" + Math.cos(alpha-(Math.PI/2)) + "* thickness}", "{" + Math.sin(alpha-(Math.PI/2)) + "* thickness}"]});
 
  				// This draws the segments which spans 3 fingers and creates the holes for the screws. 
  				// Since adding circles makes it more complicated to remove the elements from the DOM if we want to change the joint-type,
@@ -285,14 +289,18 @@ function createTSlotPath(path, gap, inset, fingers) {
  				// The problem is that we only have relative coordinates, so we need to keep track of more than just the 
 				if (i != fingers-1) {
 					newPathData.push({type: "l", values: [cos * 3 * fingerSize, sin * 3 * fingerSize]});
+					newTemplate.push({type: "l", values: [cos * 3 * fingerSize, sin * 3 * fingerSize]});
 				}
 			}
 		}
 		newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
+		newTemplate.push({type: "l", values: [(cos * gap), (sin * gap)]});
+
 		let moveBackDistance = [[0,0]]; //We need to make sure the endpoint of the path matches
 		for (let i = 0; i<Math.floor(fingers/2); i++) {
 			if (i != 0) {
 				newPathData.push({type: "m", values: [-(cos * 4 * fingerSize), -(sin * 4 * fingerSize)]});
+				newTemplate.push({type: "m", values: [-(cos * 4 * fingerSize), -(sin * 4 * fingerSize)]});
 				moveBackDistance.push([-(cos * 4 * fingerSize),-(sin * 4 * fingerSize)])
 			}
 			// Only the first one is complicated to align
@@ -304,28 +312,33 @@ function createTSlotPath(path, gap, inset, fingers) {
 				let x = -(cos * gap)-(cos * 2.5 * fingerSize)-(cos * inset/2)+(Math.cos(alpha-(Math.PI/2)) * -0.75*inset);
 				let y = -(sin * gap)-(sin * 2.5 * fingerSize)-(sin * inset/2)+(Math.sin(alpha-(Math.PI/2)) * -0.75*inset);
 				newPathData.push({type: "m", values: [x, y]});
+				newTemplate.push({type: "m", values: [x, y]}); //TODO: that's a hard one
 				moveBackDistance.push([x, y])
 
 			}
 			newPathData.push({type: "a", values: [-inset/2, -inset/2, 0, 0, 0, -cos * -inset, -sin * -inset]});
+			newTemplate.push({type: "a", values: ["-{thickness/2}", "-{thickness/2}", 0, 0, 0, "{" + cos + " * thickness}", "{" + sin + " * thickness}"]});
+
 			newPathData.push({type: "a", values: [-inset/2, -inset/2, 0, 0, 0, cos * -inset, sin * -inset]});
+			newTemplate.push({type: "a", values: ["-{thickness/2}", "-{thickness/2}", 0, 0, 0, "{" + (-cos) + " * thickness}", "{" + (-sin) + " * thickness}"]});
+
 		}
 		newPathData.push({type: "m", values: moveBackDistance.reduce((total, amount) => [total[0]-amount[0] , total[1]-amount[1]]) });
-		path.setPathData(newPathData);
+		newTemplate.push({type: "m", values: moveBackDistance.reduce((total, amount) => [total[0]-amount[0] , total[1]-amount[1]]) });
 	}
+
 	else { //The inside direction of the t-slot joint
 		//The first element of the first path segment list, as this determines the origin
 
-		newPathData.push(pathData[0]);
-	 	
-	 	newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
-	 	
+ 	
 	 	//We are now at the point to add the first finger
 		for (let i = 0; i < fingers; i += 1) {
 
 			// Check wether we need to make the t-slots or holes for the screws depending on the direction
 			if (i%2 != 0) {
 			 	newPathData.push({type: "l", values: [(cos * (fingerSize-2)/2), (sin * (fingerSize-2)/2)]});
+			 	newTemplate.push({type: "l", values: [(cos * (fingerSize-2)/2), (sin * (fingerSize-2)/2)]});
+
 
 				newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * inset/2), (Math.sin(alpha-(Math.PI/2)) * inset/2)]});
 		 		newPathData.push({type: "l", values: [(cos * -2), (sin * -2)]}); //Todo: nut size
@@ -339,27 +352,55 @@ function createTSlotPath(path, gap, inset, fingers) {
 				newPathData.push({type: "l", values: [(cos * -2), (sin * -2)]}); //Todo: nut size
 		 		newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * inset/2), (Math.sin(alpha+(Math.PI/2)) * inset/2)]});
 				newPathData.push({type: "l", values: [(cos * (fingerSize-2)/2), (sin * (fingerSize-2)/2)]});
+
+				newTemplate.push({type: "l", values: ["{" + Math.cos(alpha-(Math.PI/2)) + "* thickness/2}", "{" + Math.sin(alpha-(Math.PI/2)) + "* thickness/2}"]});
+		 		newTemplate.push({type: "l", values: [(cos * -2), (sin * -2)]}); //Todo: nut size
+		 		newTemplate.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * 2), (Math.sin(alpha-(Math.PI/2)) * 2)]});
+		 		newTemplate.push({type: "l", values: [(cos * 2), (sin * 2)]}); //Todo: nut size
+ 				newTemplate.push({type: "l", values: ["{" + Math.cos(alpha-(Math.PI/2)) + "* thickness/2}", "{" + Math.sin(alpha-(Math.PI/2)) + "* thickness/2}"]});
+		 		newTemplate.push({type: "l", values: [(cos * 2), (sin * 2)]}); //Todo: bolt diameter
+ 				newTemplate.push({type: "l", values: ["{" + Math.cos(alpha+(Math.PI/2)) + "* thickness/2}", "{" + Math.sin(alpha+(Math.PI/2)) + "* thickness/2}"]});
+		 		newTemplate.push({type: "l", values: [(cos * 2), (sin * 2)]}); //Todo: nut size
+		 		newTemplate.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * 2), (Math.sin(alpha+(Math.PI/2)) * 2)]});
+				newTemplate.push({type: "l", values: [(cos * -2), (sin * -2)]}); //Todo: nut size
+				newTemplate.push({type: "l", values: ["{" + Math.cos(alpha+(Math.PI/2)) + "* thickness/2}", "{" + Math.sin(alpha+(Math.PI/2)) + "* thickness/2}"]});
+				newTemplate.push({type: "l", values: [(cos * (fingerSize-2)/2), (sin * (fingerSize-2)/2)]});
+
 		 		if (i != fingers-1) {
 					newPathData.push({type: "l", values: [cos * fingerSize, sin * fingerSize]});
+					newTemplate.push({type: "l", values: [cos * fingerSize, sin * fingerSize]});
 				}
 
 			}
 			else {
-		 		newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * inset), (Math.sin(alpha+(Math.PI/2)) * inset)]});
+ 				newPathData.push({type: "l", values: [(Math.cos(alpha+(Math.PI/2)) * inset), (Math.sin(alpha+(Math.PI/2)) * inset)]});
 		 		newPathData.push({type: "l", values: [(cos * fingerSize), (sin * fingerSize)]});
 		 		newPathData.push({type: "l", values: [(Math.cos(alpha-(Math.PI/2)) * inset), (Math.sin(alpha-(Math.PI/2)) * inset)]});
 
+		 		newTemplate.push({type: "l", values: ["{" + Math.cos(alpha+(Math.PI/2)) + "* thickness}", "{" + Math.sin(alpha+(Math.PI/2)) + "* thickness}"]});
+ 				newTemplate.push({type: "l", values: [(cos * fingerSize), (sin * fingerSize)]});
+ 				newTemplate.push({type: "l", values: ["{" + Math.cos(alpha-(Math.PI/2)) + "* thickness}", "{" + Math.sin(alpha-(Math.PI/2)) + "* thickness}"]});
+
 				if (i != fingers-1) {
 					newPathData.push({type: "l", values: [cos * fingerSize, sin * fingerSize]});
+					newTemplate.push({type: "l", values: [cos * fingerSize, sin * fingerSize]});
+
 				}
 			}
 		}
 
 		// Close the second gap
 		newPathData.push({type: "l", values: [(cos * gap), (sin * gap)]});
-
-		path.setPathData(newPathData);
+		newTemplate.push({type: "l", values: [(cos * gap), (sin * gap)]});
 	}
+
+	path.setPathData(newPathData);
+
+	//We need to convert the pathSegment list into a string that we can store as template
+	let tempTemplate = newTemplate.map(function (object) {return object.type + object.values.join(" ") }).join(" ");
+	path.setAttributeNS(laser_NS, "laser:template", tempTemplate);
+
+	updateThickness(materialThickness);
 }
 
 function createJoints() {
