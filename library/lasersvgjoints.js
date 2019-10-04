@@ -309,8 +309,9 @@ function createTSlotPath(path, gap, inset, fingers) {
 			// We need to shift everything by inset/2 because we work with arcs and therefore need the starting point on the outline of the circle
 			// finally, we need to shift everything by inset perpendicular to the path such that the holes are not centered on the path itself
 			else {
-				let x = -(cos * gap)-(cos * 2.5 * fingerSize)-(cos * inset/2)+(Math.cos(alpha+(Math.PI/2)) * -0.75*inset);
-				let y = -(sin * gap)-(sin * 2.5 * fingerSize)-(sin * inset/2)+(Math.sin(alpha+(Math.PI/2)) * -0.75*inset);
+				let x = -cos * (gap + 2.5 * fingerSize - inset/2)+(Math.cos(alpha+(Math.PI/2)) * -0.75 * inset);
+				let y = -sin * (gap + 2.5 * fingerSize - inset/2)+(Math.sin(alpha+(Math.PI/2)) * -0.75 * inset);
+				// In the template, inset has to be replaced with thickness
 				let templateX = "{ (" + (-(cos * gap)-(cos * 2.5 * fingerSize))+") + " + (-cos/2 + (Math.cos(alpha+(Math.PI/2)) * -0.75))  + "* thickness}";
 				let templateY = "{ (" + (-(sin * gap)-(sin * 2.5 * fingerSize))+") + " + (-sin/2 + (Math.sin(alpha+(Math.PI/2)) * -0.75))  + "* thickness}";
 				newPathData.push({type: "m", values: [x, y]});
@@ -326,7 +327,8 @@ function createTSlotPath(path, gap, inset, fingers) {
 
 		}
 		newPathData.push({type: "m", values: moveBackDistance.reduce((total, amount) => [total[0]-amount[0] , total[1]-amount[1]]) });
-		newTemplate.push({type: "m", values: moveBackDistance.reduce((total, amount) => [total[0]-amount[0] , total[1]-amount[1]]) });
+		newTemplate.push({type: "m", values:["{" + (cos*((6.5 * fingerSize) + gap)) + "+" + (Math.cos(alpha-(Math.PI/2)) * -0.75 + cos/2) + " * thickness}" , "{" + (sin * ((6.5 * fingerSize) + gap)) + "+" + (Math.sin(alpha-(Math.PI/2)) * -0.75 + sin/2) + " * thickness}"] });
+		//newTemplate.push({type: "m", values: moveBackDistance.reduce((total, amount) => [total[0]-amount[0] , total[1]-amount[1]]) });
 	}
 
 	else { //The inside direction of the t-slot joint
