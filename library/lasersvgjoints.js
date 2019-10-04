@@ -12,6 +12,28 @@
 var numberOfFingers = 5;
 
 
+function createNoJointPath(path, gap, inset, fingers) {
+	let pathData = path.getPathData({normalize: true});
+
+	if (pathData.length < 2) {
+		return;
+	}
+
+	let width = pathData[pathData.length-1].values[0] - pathData[0].values[0];
+	let height = pathData[pathData.length-1].values[1] - pathData[0].values[1];
+
+	let newPathData = []; 
+	newPathData.push(pathData[0]);
+ 	
+ 	newPathData.push({type: "l", values: [width, height]});
+ 	
+	path.setPathData(newPathData);
+
+	path.removeAttributeNS(laser_NS, "template");
+
+}
+
+
 /************************* Parametric Fabrication ****************************************************/
 
 // @param path: the path to replace. Only the connection between the first two points is considered.
@@ -328,7 +350,6 @@ function createTSlotPath(path, gap, inset, fingers) {
 		}
 		newPathData.push({type: "m", values: moveBackDistance.reduce((total, amount) => [total[0]-amount[0] , total[1]-amount[1]]) });
 		newTemplate.push({type: "m", values:["{" + (cos*((6.5 * fingerSize) + gap)) + "+" + (Math.cos(alpha-(Math.PI/2)) * -0.75 + cos/2) + " * thickness}" , "{" + (sin * ((6.5 * fingerSize) + gap)) + "+" + (Math.sin(alpha-(Math.PI/2)) * -0.75 + sin/2) + " * thickness}"] });
-		//newTemplate.push({type: "m", values: moveBackDistance.reduce((total, amount) => [total[0]-amount[0] , total[1]-amount[1]]) });
 	}
 
 	else { //The inside direction of the t-slot joint
@@ -425,6 +446,7 @@ function createJoints() {
 		//create a new path with the joint pattern
 		if (path.hasAttributeNS(laser_NS,'joint-type')) {
 			switch(path.getAttributeNS(laser_NS,'joint-type')) {
+				case 'none' : createNoJointPath(path, 0, 0, numberOfFingers); break;
 				case 'finger': createFingerJointPath(path, 5, materialThickness * direction, numberOfFingers); break;
 				case 'finger-compact': createCompactFingerJointPath(path, 5, materialThickness * direction, numberOfFingers); break;
 				case 'flap': createFlapJointPath(path, 5, materialThickness * direction, 2); break;
