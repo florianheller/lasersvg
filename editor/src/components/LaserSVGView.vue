@@ -32,7 +32,8 @@ export default {
 		})
 		// eslint-disable-next-line no-unused-vars
 		window.eventBus.$on('documentLoaded', (event) => {
-			this.checkLaserSVGFeatures(this.$refs['DrawingArea']);
+			this.checkLaserSVGFeatures(this.$refs['DrawingArea']); //Check if all the LaserSVG details are in there
+			this.addEditEventHandlers(); //Add the handlers needed to being able to edit the file.
 		})
 	},
 	methods: {
