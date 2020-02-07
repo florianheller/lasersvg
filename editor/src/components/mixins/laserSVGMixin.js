@@ -63,6 +63,15 @@ export const laserSvg = {
 					}
 				}
 			}
+		},
+		removeEditEventHandlers() {
+			let tags = ['path', 'rect', 'circle'];
+			for (let tag of tags) {
+				let elements = window.laserSvgRoot.getElementsByTagName(tag);
+				for (let element of elements) {
+					element.onclick = null;
+				}
+			}
 		}
 	}
 }

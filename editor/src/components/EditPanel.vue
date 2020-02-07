@@ -1,6 +1,6 @@
 <template>
 	<div id="editPanel">
-		<FileHandler></FileHandler>
+		<FileHandler v-bind:laserSVGScript="laserSVGScript"></FileHandler>
 		<div class="panelSection"><h3>Zoom</h3> <button type="button"  @click="zoom('-')" class="zoomButton">-</button><button type="button" @click="zoom('+')" class="zoomButton">+</button><span>{{scalingFactor}}%</span></div>
 		
 		<div class="panelSection">
@@ -109,6 +109,7 @@ export default {
 <style scoped>
 
 h3 {
+	margin-top: 3px;
 	margin-bottom: 3px;
 }
 
