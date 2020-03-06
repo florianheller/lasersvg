@@ -429,7 +429,6 @@ function redrawSelection() {
 
 // Save a LaserSVG File
 function getImageForSaving() {
-	removeEditUtilities();
 
 	let serializer = new XMLSerializer();
 	return serializer.serializeToString(laserSvgRoot);
@@ -438,7 +437,7 @@ function getImageForSaving() {
 //Export an SVG file 
 function getImageForExport() {
 	// TODO: remove the lines vizualizing the connections
-	removeEditUtilities();
+	//removeEditUtilities();
 	//Adjust for Kerf if required
 	adjustForKerf();
 
@@ -470,7 +469,6 @@ function svgLoaded(event) {
 	if (laserIsLoaded == true) { return; }
 	laserIsLoaded = true;
 	console.log("Laser SVG Loaded");
-
 	// Setting up pointers to the document root itself.
 	if (event.tagName == "svg") {
 		laserSvgRoot = event;
@@ -545,8 +543,6 @@ function checkURLParameters() {
 // means it's safe to run the script.
 document.addEventListener("DOMContentLoaded", function(e) {
       svgLoaded(document);
-      		addEditEventHandlers(laserSvgRoot);
-
 });
 
 // If we get loaded in an editor, it's a bit more tricky. 
@@ -559,6 +555,14 @@ document.addEventListener("DOMContentLoaded", function(e) {
 
 // If the script gets added dynamically to an SVG, the eventListener above will not get fired. 
 if(typeof window.parent.svgDidLoad === "function") { 
+	window.parent.laserSvgScript = this;
+
 	svgLoaded(document);
 }
 
+
+// This is to test the connection between the host script and the SVG script
+function hello() {
+	console.log('Hello, this is your LaserSVG script speaking!');
+	return "Hello!";
+}

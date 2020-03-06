@@ -315,42 +315,21 @@ function onLengthHighlightClicked(event, elementID, info, otherHighlight) {
  * Functions that provide functionality to be called from the host script. This is not invoked from the drawing itself.
  */
 
-var currentSelection;
-
-function setPropertyForSelection(property, value) {
-	currentSelection.setAttributeNS(laser_NS, "laser:" + property, value);
-}
-
-function addEditEventHandlers() {
-	let tags = ['path', 'rect', 'circle'];
-	for (let tag of tags) {
-		let elements = laserSvgRoot.getElementsByTagName(tag);
-		console.log(elements);
-		console.log(elements.length);
-		for (let element of elements) {
-			element.onclick = function (event) {
-				let segmentIndex = isInWhichSegment(this, event.clientX, event.clientY);
-				highlightPathSegment(this, segmentIndex, "pathTemplate");
-				// clear selection by removing the selected class from all other tags
-				for (let e of laserSvgRoot.querySelectorAll('.selected')) {
-					e.classList.remove("selected");
-					if (e.getAttribute("class") == "" ) { e.removeAttribute("class"); } // Leave a clean DOM
-				}
-				currentSelection = this;
-				this.classList.add("selected");
-				parentDocument.didSelectElement(this, segmentIndex); //Notify the host script
-			}
-		}
+// Set a property on a certain node to a given value
+// If value is an empty string, the attribute is removed from the node. 
+function setProperty(element, property, value) {
+	if (value != "") {
+		element.setAttributeNS(laser_NS, "laser:" + property, value);
+	}
+	else {
+		element.removeAttributeNS(laser_NS, "laser:" + property);
 	}
 }
 
-function removeEditEventHandlers() {
-	let tags = ['path', 'rect'];
-	for (var tag of tags) {
-		let elements = laserSvgRoot.getElementsByTagName(tag);
-		for (var element of elements) {
-			element.onclick = null;
-		}
+function getProperty(element, property) {
+	console.log("LaserSVG getProperty" + element + " property:" + property);
+	if (element.hasAttributeNS(laser_NS,property)) {
+		return element.getAttributeNS(laser_NS,property);
 	}
 }
 
