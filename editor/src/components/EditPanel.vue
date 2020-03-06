@@ -36,9 +36,9 @@
 			v-if="currentSelection.tagName === 'path'" 
 			v-bind:element="currentSelection"
 			v-bind:laserSVGScript="laserSVGScript"></PathEditPanel>
-		
 		</div>
 	</div>
+
 </template>
 
 <script>

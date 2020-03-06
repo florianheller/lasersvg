@@ -15,7 +15,6 @@
 				</table>
 			</div>
 
-			<button type="button" id="tagToolToggle" onclick="toggleTagTool(this)">Tag</button>
 			<button type="button" id="convertToThickness" onclick="convertButtonClicked(this)">Convert</button>
 			<button type="button" id="pathTemplateSave" onclick="setPathTemplate(this)">Apply</button>
 	</div>
