@@ -322,7 +322,7 @@ function setProperty(element, property, value) {
 		element.setAttributeNS(laser_NS, "laser:" + property, value);
 	}
 	else {
-		element.removeAttributeNS(laser_NS, "laser:" + property);
+		element.removeAttributeNS(laser_NS, property);
 	}
 }
 
