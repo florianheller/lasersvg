@@ -26,7 +26,7 @@
  *	TODO: add handling for ellipses, polygons, and polylines (https://www.w3.org/TR/SVG2/shapes.html#EllipseElement)
  */
 
-const laser_NS = 'http://www.heller-web.net/lasersvg';
+const laser_NS = 'http://www.heller-web.net/lasersvg/';
 const svg_NS = 'http://www.w3.org/2000/svg';
 const laserSvgURL = 'http://www2.heller-web.net/lasersvg/';
 // References to the different points in the DOM
