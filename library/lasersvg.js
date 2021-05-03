@@ -62,58 +62,72 @@ function updateThickness(newThickness) {
 	let thickness = materialThickness;
 
 	// Iterate over all objects in the SVG
-	var elements = laserSvgRoot.querySelectorAll('*');
+	let elements = laserSvgRoot.querySelectorAll('*');
 
 	for (let element of elements) {
+		// TODO: Remove local thickness declaration? 
 			if (element.hasAttributeNS(laser_NS,'thickness')) {
 				thickness = element.getAttributeNS(laser_NS,'thickness');
 			}
 			// If the origin is specified, 
+			let origin = ""
+			let adjust = ""
+			// Check if it has a material thickness attribute
+			if (element.hasAttributeNS(laser_NS,'thickness-adjust')) {
+				adjust = element.getAttributeNS(laser_NS,'thickness-adjust');
+				switch (adjust) {
+					case 'width': element.setAttribute("width", thickness); break; 
+					case 'height': element.setAttribute("height", thickness); break; 
+					case 'both': element.setAttribute("height", thickness); element.setAttribute("width", thickness); break;
+					default: break; // Results to none
+				}
+			}
+
 			if (element.hasAttributeNS(laser_NS,'origin')) {
 				// In that case, we also need to adjust the position of the element. 
 				// For that purpose we have two options: either we save the original position or we take the previous thickness value and calculate the difference. 
 				// The advantage of saving the original values is that errors don't add up if we work with float-thicknesses. 
-				var originX, originY;
-				if (!element.hasAttributeNS(laser_NS,'originX')) {
-					originX = Number(element.getAttribute('x')) + oldThickness;
-					element.setAttributeNS(laser_NS, 'laser:originX', originX );
+				let originX, originY, centerX, centerY;
+				if (!element.hasAttributeNS(laser_NS,'x')) {
+					centerX = Number(element.getAttribute('x')) + (oldThickness/2);
+					element.setAttributeNS(laser_NS, 'laser:centerX', centerX);
+					element.setAttributeNS(laser_NS, 'laser:x', element.getAttribute('x') );
 				}
-				else {
-					originX = Number(element.getAttributeNS(laser_NS,'originX'));
+				
+				originX = Number(element.getAttributeNS(laser_NS,'x'));
+				centerX = Number(element.getAttributeNS(laser_NS,'centerX'));
+				
+				if (!element.hasAttributeNS(laser_NS,'y')) {
+					centerY = Number(element.getAttribute('y')) + (oldThickness/2);
+					element.setAttributeNS(laser_NS, 'laser:centerY', centerY );
+					element.setAttributeNS(laser_NS, 'laser:y', element.getAttribute('y'));
 				}
-				if (!element.hasAttributeNS(laser_NS,'originY')) {
-					originY = Number(element.getAttribute('y')) + oldThickness;
-					element.setAttributeNS(laser_NS, 'laser:originY', originY);
-				}
-				else {
-					originY = Number(element.getAttributeNS(laser_NS,'originY'));
-				}
+				originY = Number(element.getAttributeNS(laser_NS,'y'));
+				centerY = Number(element.getAttributeNS(laser_NS,'centerY'));
+				
 
-				var origin = element.getAttributeNS(laser_NS,'origin');
+				origin = element.getAttributeNS(laser_NS,'origin');
 				switch(origin) {
 					// case 'top': break; //Default
-					case 'bottom': element.setAttribute("y", originY - thickness); break;
+					case 'bottom': if (adjust === "height" || adjust === "both") { element.setAttribute("y", Number(element.getAttribute('y')) + oldThickness - newThickness); } break;
 					// case 'left': break; //Default
-					case 'right': element.setAttribute("x", originX - thickness); break;
+					case 'right': if (adjust === "width" || adjust === "both") { element.setAttribute("x", Number(element.getAttribute('x')) + oldThickness - newThickness); } break;
 					// case 'top-left': break; // Default
 					case 'top-right': break;
 					// case 'bottom-left': break; //Same as bottom
-					case 'bottom-right': element.setAttribute("y", originY - thickness);  element.setAttribute("x", originX + thickness); break;
-					case 'center':  element.setAttribute("y", (originalY - thickness)/2);  element.setAttribute("x", (originX + thickness)/2); break;
+					case 'bottom-right': 
+						if (adjust === "height" || adjust === "both") { element.setAttribute("y", originY + oldThickness - newThickness); }
+						if (adjust === "width" || adjust === "both") { element.setAttribute("x", originX + oldThickness - newThickness); } 
+						break;
+					case 'center':  
+						if (adjust === "height" || adjust === "both") { element.setAttribute("y", centerY - (newThickness/2)); }
+						if (adjust === "width" || adjust === "both") { element.setAttribute("x", centerX - (newThickness/2)); }
+						break;
 				}
 
 			}
 
-		// Check if it has a material thickness attribute
-		if (element.hasAttributeNS(laser_NS,'thickness-adjust')) {
-			var setting = element.getAttributeNS(laser_NS,'thickness-adjust');
-			switch (setting) {
-				case 'width': element.setAttribute("width", thickness); break; 
-				case 'height': element.setAttribute("height", thickness); break; 
-				case 'both': element.setAttribute("height", thickness); element.setAttribute("width", thickness); break;
-				default: break; // Results to none
-			}
-		}
+
 		// Check if the element has a template attribute
 		if (element.hasAttributeNS(laser_NS,'template')) {
 			// We need to multiply thickness with inverted scalingFactor as the path will be scaled afterwards
@@ -166,11 +180,17 @@ function scale(scalingFactor) {
 				element.setAttribute("ry", Number(element.getAttribute("ry"))*scalingFactor);
 			}
 			// Change the coordinates that might have been saved along with the 'origin' parameter
-			if (element.hasAttributeNS(laser_NS,"originX")) {
-				element.setAttributeNS(laser_NS, 'laser:originX', Number(element.getAttributeNS(laser_NS,"originX"))*scalingFactor);
+			if (element.hasAttributeNS(laser_NS,"x")) {
+				element.setAttributeNS(laser_NS, 'laser:x', Number(element.getAttributeNS(laser_NS,"x"))*scalingFactor);
 			}
-			if (element.hasAttributeNS(laser_NS,"originY")) {
-				element.setAttributeNS(laser_NS, 'laser:originY', Number(element.getAttributeNS(laser_NS,"originY"))*scalingFactor);
+			if (element.hasAttributeNS(laser_NS,"y")) {
+				element.setAttributeNS(laser_NS, 'laser:y', Number(element.getAttributeNS(laser_NS,"y"))*scalingFactor);
+			}
+			if (element.hasAttributeNS(laser_NS,"centerX")) {
+				element.setAttributeNS(laser_NS, 'laser:centerX', Number(element.getAttributeNS(laser_NS,"centerX"))*scalingFactor);
+			}
+			if (element.hasAttributeNS(laser_NS,"centerY")) {
+				element.setAttributeNS(laser_NS, 'laser:centerY', Number(element.getAttributeNS(laser_NS,"centerY"))*scalingFactor);
 			}
 			if (element.hasAttributeNS(laser_NS,"r")) {
 				element.setAttributeNS(laser_NS, 'laser:r', Number(element.getAttributeNS(laser_NS,"r"))*scalingFactor);
