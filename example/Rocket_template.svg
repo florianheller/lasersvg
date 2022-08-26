@@ -1,4 +1,4 @@
-<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="600mm" height="300mm" viewBox="0 0 600 300" version="1.1" xml:space="preserve"  xmlns:laser="http://www.heller-web.net/lasersvg" xmlns:xlink="http://www.w3.org/1999/xlink" laser:material-thickness="3" laser:action="cut">
+<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" width="600mm" height="300mm" viewBox="0 0 600 300" version="1.1" xml:space="preserve"  xmlns:laser="http://www.heller-web.net/lasersvg/" xmlns:xlink="http://www.w3.org/1999/xlink" laser:material-thickness="3" laser:action="cut">
     <script type="text/javascript"><![CDATA[
 		function triangleRadius(length, thickness) {
 			// Calculate the middle points of the thickness edges

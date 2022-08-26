@@ -8,7 +8,7 @@
     http://www.heller-web.net/lasersvg
 -->
 <?xml-stylesheet type="text/css" href="http://www2.heller-web.net/lasersvg/lasersvg.css"?>
-<svg width="270mm" height="100mm" version="1.1" viewBox="-5, -5, 270, 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:laser="http://www.heller-web.net/lasersvg" laser:material-thickness="3" laser:kerf="0.2" laser:action="cut">
+<svg width="270mm" height="100mm" version="1.1" viewBox="-5, -5, 270, 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:laser="http://www.heller-web.net/lasersvg/" laser:material-thickness="3" laser:kerf="0.2" laser:action="cut">
 	<script type="text/javascript" xlink:href="http://www2.heller-web.net/lasersvg/lasersvg.js" />
      
 	<path id="benchPlank" d="m 55 0 l 150 0 l 0 5 l 3 0 l 0 5 l -3 0 l 0 5 l 3 0 l 0 5 l -3 0 l 0 5 l -150 0 l 0 -5 l -3 0 l 0 -5 l 3 0 l 0 -5 l -3 0 l 0 -5 l 3 0 z" laser:template="m 55 0 l 150 0 l 0 5 l {thickness} 0 l 0 5 l -{thickness} 0 l 0 5 l {thickness} 0 l 0 5 l -{thickness} 0 l 0 5 l -150 0 l 0 -5 l -{thickness} 0 l 0 -5 l {thickness} 0 l 0 -5 l -{thickness} 0 l 0 -5 l {thickness} 0 z" laser:kerf-mask="i i g i s i g i s i i i g i s i g i s i"

@@ -26,7 +26,7 @@
  *	TODO: add handling for ellipses, polygons, and polylines (https://www.w3.org/TR/SVG2/shapes.html#EllipseElement)
  */
 
-const laser_NS = 'http://www.heller-web.net/lasersvg';
+const laser_NS = 'http://www.heller-web.net/lasersvg/';
 const svg_NS = 'http://www.w3.org/2000/svg';
 const laserSvgURL = 'http://www2.heller-web.net/lasersvg/';
 // References to the different points in the DOM
@@ -374,7 +374,6 @@ function changePathSegmentLength(pathData, offset) {
 function isInWhichSegment(pathElement, x, y) {
  	if (pathElement.tagName != "path") { return; }
 
-
  	// The problem is that (except for firefox, the click coordinates are returned in pixels, not in svg coordinate space)
  	// So we first need to determine the scaling factor for x an y
  	// And make the coordinates relative to the bounding box
@@ -394,22 +393,30 @@ function isInWhichSegment(pathElement, x, y) {
 	x += bBox.x;
  	y += bBox.y;
 
-	
+ 	// Make x integers
+	x = x | 0;
+	y = y | 0;
+
    var seg = -1;
    var len = pathElement.getTotalLength();
    // You get get the coordinates at the length of the path, so you
    // check at all length point to see if it matches
    // the coordinates of the click
-   let tolerance = 2;
+   // Basically look for a local minimum. The hit-test of the browser should already help us here. 
+   let tolerance = 0;
+   let minimumDistance = Number.MAX_VALUE;
+   let currentDistance = 0;
+   let lengthAtMinimum = -1;
    for (var i = 0; i < len; i++) {
      var pt = pathElement.getPointAtLength(i);
-     // you need to take into account the stroke width, hence the +- 2
-     //if ((pt.x < (x + tolerance) && pt.x > (x - tolerance)) && (pt.y > (y - tolerance) && pt.y < (y + tolerance))) {
-     if ((x < (pt.x + tolerance) && x > (pt.x - tolerance)) && (y > (pt.y - tolerance) && y < (pt.y + tolerance))) {
-       seg = pathElement.getPathSegAtLength(i);
-       break;
-     }
+
+     // We don't need to calculate square roots here, since we only compare
+     currentDistance = ((x - pt.x) ** 2) + ((y - pt.y) ** 2);
+     if (currentDistance <= minimumDistance) { minimumDistance = currentDistance; lengthAtMinimum = i; }
+
    }
+
+   seg = pathElement.getPathSegAtLength(lengthAtMinimum); 
    return seg;
  }
 
@@ -429,7 +436,6 @@ function redrawSelection() {
 
 // Save a LaserSVG File
 function getImageForSaving() {
-	removeEditUtilities();
 
 	let serializer = new XMLSerializer();
 	return serializer.serializeToString(laserSvgRoot);
@@ -438,7 +444,7 @@ function getImageForSaving() {
 //Export an SVG file 
 function getImageForExport() {
 	// TODO: remove the lines vizualizing the connections
-	removeEditUtilities();
+	//removeEditUtilities();
 	//Adjust for Kerf if required
 	adjustForKerf();
 
@@ -470,7 +476,6 @@ function svgLoaded(event) {
 	if (laserIsLoaded == true) { return; }
 	laserIsLoaded = true;
 	console.log("Laser SVG Loaded");
-
 	// Setting up pointers to the document root itself.
 	if (event.tagName == "svg") {
 		laserSvgRoot = event;
@@ -545,8 +550,6 @@ function checkURLParameters() {
 // means it's safe to run the script.
 document.addEventListener("DOMContentLoaded", function(e) {
       svgLoaded(document);
-      		addEditEventHandlers(laserSvgRoot);
-
 });
 
 // If we get loaded in an editor, it's a bit more tricky. 
@@ -559,6 +562,14 @@ document.addEventListener("DOMContentLoaded", function(e) {
 
 // If the script gets added dynamically to an SVG, the eventListener above will not get fired. 
 if(typeof window.parent.svgDidLoad === "function") { 
+	window.parent.laserSvgScript = this;
+
 	svgLoaded(document);
 }
 
+
+// This is to test the connection between the host script and the SVG script
+function hello() {
+	console.log('Hello, this is your LaserSVG script speaking!');
+	return "Hello!";
+}
