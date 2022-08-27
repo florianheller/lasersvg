@@ -27,10 +27,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Assemble Lib
-        run: cat lasersvg.js lasersvgedit.js lasersvgjoints.js path-data-polyfill.js > ./docs/lib/lasersvg.js
       - name: Setup Pages
         uses: actions/configure-pages@v2
+      - name: Assemble Lib
+        run: |
+          ls
+          ls ./docs
+          cat lasersvg.js lasersvgedit.js lasersvgjoints.js path-data-polyfill.js > ./docs/lib/lasersvg.js
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
