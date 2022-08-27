@@ -32,7 +32,7 @@ jobs:
       - name: Assemble Lib
         run: |
           ls ./docs
-          cat ./library/lasersvg.js ./library/lasersvgedit.js ./library/lasersvgjoints.js ./library/path-data-polyfill.js > ./docs/lib/lasersvg.js
+          cat ./library/lasersvg.js ./library/lasersvgedit.js ./library/lasersvgjoints.js ./library/path-data-polyfill.js > ./docs/lasersvg.js
           ls ./docs
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
