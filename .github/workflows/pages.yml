@@ -31,9 +31,9 @@ jobs:
         uses: actions/configure-pages@v2
       - name: Assemble Lib
         run: |
-          ls
           ls ./docs
-          cat lasersvg.js lasersvgedit.js lasersvgjoints.js path-data-polyfill.js > ./docs/lib/lasersvg.js
+          cat ./library/lasersvg.js ./library/lasersvgedit.js ./library/lasersvgjoints.js ./library/path-data-polyfill.js > ./docs/lib/lasersvg.js
+          ls ./docs
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
