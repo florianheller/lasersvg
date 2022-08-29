@@ -7,7 +7,7 @@
  *	Copyright C2017 Florian Heller florian.heller<at>uhasselt.be
  *	
  *	See http://www.heller-web.net/lasersvg
- *	or http://github.io/florianheller/lasersvg for more info
+ *	or https://florianheller.github.io/lasersvg/ for more info
  * 
  * 
  *	
@@ -28,7 +28,7 @@
 
 const laser_NS = 'http://www.heller-web.net/lasersvg/';
 const svg_NS = 'http://www.w3.org/2000/svg';
-const laserSvgURL = 'http://www2.heller-web.net/lasersvg/';
+const laserSvgURL = 'https://florianheller.github.io/lasersvg/';
 // References to the different points in the DOM
 var parentDocument;
 var laserSvgDocument;

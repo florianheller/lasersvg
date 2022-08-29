@@ -6,7 +6,7 @@
  *	Copyright C2017 Florian Heller florian.heller<at>uhasselt.be
  *	
  *	See http://www.heller-web.net/lasersvg
- *	or http://github.io/florianheller/lasersvg for more info
+ *	or https://florianheller.github.io/lasersvg/ for more info
  */
 
 
