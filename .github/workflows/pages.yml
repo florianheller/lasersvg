@@ -33,6 +33,7 @@ jobs:
         run: |
           cat ./library/lasersvg.js ./library/lasersvgedit.js ./library/lasersvgjoints.js ./library/path-data-polyfill.js > ./docs/lasersvg.js
           cp ./library/lasersvg.css ./docs/lasersvg.css
+          mv example ./docs
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
