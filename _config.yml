@@ -4,10 +4,8 @@ description: >- # this means to ignore newlines until "baseurl:"
   LaserSVG is an exension to the SVG file format that allows you 
   to integrate additional information necessary to quickly 
   adapt a design to a different material thickness.
-#baseurl: "" # the subpath of your site, e.g. /blog
-#url: "https://lasersvg.onrender.com" # the base hostname & protocol for your site, e.g. http://example.com
-baseurl: "/w/lasersvg-C079"
-url: "https://anonymous.4open.science"
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "https://lasersvg.onrender.com" # the base hostname & protocol for your site, e.g. http://example.com
 #twitter_username: jekyllrb
 #github_username:  jekyll
 
