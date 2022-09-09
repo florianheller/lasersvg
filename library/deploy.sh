@@ -1,2 +1,2 @@
-cat lasersvg.js lasersvgedit.js lasersvgjoints.js path-data-polyfill.js > ../docs/lasersvg.js
-cp lasersvg.css ../docs/
+cat library/lasersvg.js library/lasersvgedit.js library/lasersvgjoints.js library/path-data-polyfill.js > ../docs/lasersvg.js
+cp library/lasersvg.css ../docs/
