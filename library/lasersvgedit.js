@@ -155,9 +155,9 @@ function exportSVG() {
 	let downloadLink = document.createElement("a");
 	downloadLink.href = svgUrl;
 	downloadLink.download = "laserExport.svg";
-	document.body.appendChild(downloadLink);
+	document.documentElement.appendChild(downloadLink);
 	downloadLink.click();
-	document.body.removeChild(downloadLink);
+	document.documentElement.removeChild(downloadLink);
 }
 
 /************************* Visualization Helpers  ****************************************************/
