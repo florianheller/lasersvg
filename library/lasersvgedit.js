@@ -10,7 +10,7 @@
  */
 
 
-var menuItems = ["thicknessButton", "kerfButton", "scaleButton"]
+var menuItems = ["thicknessButton", "kerfButton", "scaleButton", "exportButton"]
 
 function toggleItem(item) {
 	laserSvgRoot.getElementById(item).style.opacity = (laserSvgRoot.getElementById(item).style.opacity == 1) ? 0 : 1;
@@ -40,6 +40,10 @@ function setScaleClicked() {
   	if (newScale != null && newScale != "") {
   		scale(Number(newScale)/100)
   	}
+}
+
+function saveClicked() {
+	exportSVG();
 }
 
 function setJointsChanged() {
@@ -102,7 +106,8 @@ function createMenuButton(item, index, array) {
  	let buttons = [	{ id:"edit", title:"⚙︎", x:0, y:0, width:10, height:10, textXOffset:2, textYOffset:8, onclick:"showMenu()", fontSize:10},
  					{ id:"thickness", title:"Thickness", x:12, y:0, width:30,  height:10, textXOffset:1, textYOffset:7, onclick:"setThicknessClicked()", fontSize:5},
  					{ id:"kerf", title:"Kerf", x:44, y:0, width:30, textXOffset:8,  height:10, textYOffset:7, onclick:"setKerfClicked()", fontSize:5},
- 					{ id:"scale", title:"Scale", x:76, y:0, width:30, textXOffset:7, height:10,  textYOffset:7, onclick:"setScaleClicked()", fontSize:5}
+ 					{ id:"scale", title:"Scale", x:76, y:0, width:30, textXOffset:7, height:10,  textYOffset:7, onclick:"setScaleClicked()", fontSize:5},
+					 { id:"export", title:"Save", x:76, y:0, width:30, textXOffset:7, height:10,  textYOffset:7, onclick:"exportClicked()", fontSize:5}
 				]
 
 	let menu = document.createElementNS(svg_NS,"foreignObject");
@@ -134,6 +139,25 @@ function createMenuButton(item, index, array) {
 	laserSvgRoot.setAttribute("viewBox", vBoxValues.join(" "));
 	
  	
+}
+
+/* This function exports the SVG with all changes as a new file
+ * So the DOM as it is right now. 
+ * @return the current DOM with all changes applied
+ * @see saveSVG()
+ */
+function exportSVG() {
+	// Get the source
+	source = laserSvgScript.getImageForExport();
+
+	var svgBlob = new Blob([source], {type:"image/svg+xml;charset=utf-8"});
+	var svgUrl = URL.createObjectURL(svgBlob);
+	var downloadLink = document.createElement("a");
+	downloadLink.href = svgUrl;
+	downloadLink.download = "laserExport.svg";
+	document.body.appendChild(downloadLink);
+	downloadLink.click();
+	document.body.removeChild(downloadLink);
 }
 
 /************************* Visualization Helpers  ****************************************************/
