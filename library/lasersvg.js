@@ -468,15 +468,11 @@ function getImageForExport() {
 	//Adjust for Kerf if required
 	adjustForKerf();
 
-	laserSvgRoot = laserSvgDocument.documentElement;	// The DOM-Root of our svg document.
 	laserSvgRoot.setAttributeNS(laser_NS, "laser:material-thickness", materialThickness);
 	laserSvgRoot.setAttributeNS(laser_NS, "laser:kerf", kerf);
 	
 	let serializer = new XMLSerializer();
-	let document = serializer.serializeToString(laserSvgRoot);
-
-	
-	return document;
+	return serializer.serializeToString(laserSvgRoot);
 }
 
 /************* Onload Functionality *****************
