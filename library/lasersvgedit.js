@@ -42,7 +42,7 @@ function setScaleClicked() {
   	}
 }
 
-function saveClicked() {
+function exportClicked() {
 	exportSVG();
 }
 
