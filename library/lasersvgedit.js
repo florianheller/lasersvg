@@ -148,11 +148,11 @@ function createMenuButton(item, index, array) {
  */
 function exportSVG() {
 	// Get the source
-	source = laserSvgScript.getImageForExport();
+	source = getImageForExport();
 
-	var svgBlob = new Blob([source], {type:"image/svg+xml;charset=utf-8"});
-	var svgUrl = URL.createObjectURL(svgBlob);
-	var downloadLink = document.createElement("a");
+	let svgBlob = new Blob([source], {type:"image/svg+xml;charset=utf-8"});
+	let svgUrl = URL.createObjectURL(svgBlob);
+	let downloadLink = document.createElement("a");
 	downloadLink.href = svgUrl;
 	downloadLink.download = "laserExport.svg";
 	document.body.appendChild(downloadLink);
