@@ -155,7 +155,7 @@ function exportSVG() {
 	let downloadLink = document.createElement("a");
 	const xlink_NS = "http://www.w3.org/1999/xlink";
 	downloadLink.setAttributeNS(xlink_NS, "xlink:href", svgUrl);
-	downloadLink.setAttribute("download" = "laserExport.svg");
+	downloadLink.setAttribute("download","laserExport.svg");
 	document.documentElement.appendChild(downloadLink);
 	let event =  new MouseEvent("click");
 	downloadLink.dispatchEvent(event);
