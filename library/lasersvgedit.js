@@ -154,7 +154,7 @@ function exportSVG() {
 	let svgUrl = URL.createObjectURL(svgBlob);
 	let downloadLink = document.createElement("a");
 	let downloadText = document.createElement("text");
-	downloadText.innerText = "Download";
+	downloadText.innerHTML = "Download";
 	downloadLink.appendChild(downloadText);
 	const xlink_NS = "http://www.w3.org/1999/xlink";
 	downloadLink.setAttributeNS(xlink_NS, "xlink:href", svgUrl);
