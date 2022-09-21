@@ -148,15 +148,17 @@ function createMenuButton(item, index, array) {
  */
 function exportSVG() {
 	// Get the source
-	source = getImageForExport();
+	let source = getImageForExport();
 
 	let svgBlob = new Blob([source], {type:"image/svg+xml;charset=utf-8"});
 	let svgUrl = URL.createObjectURL(svgBlob);
 	let downloadLink = document.createElement("a");
-	downloadLink.href = svgUrl;
-	downloadLink.download = "laserExport.svg";
+	const xlink_NS = "http://www.w3.org/1999/xlink";
+	downloadLink.setAttributeNS(xlink_NS, "xlink:href", svgUrl);
+	downloadLink.setAttribute("download" = "laserExport.svg");
 	document.documentElement.appendChild(downloadLink);
-	downloadLink.click();
+	let event =  new MouseEvent("click");
+	downloadLink.dispatchEvent(event);
 	document.documentElement.removeChild(downloadLink);
 }
 
