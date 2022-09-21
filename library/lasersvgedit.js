@@ -152,7 +152,7 @@ function exportSVG() {
 
 	let svgBlob = new Blob([source], {type:"image/svg+xml;charset=utf-8"});
 	let svgUrl = URL.createObjectURL(svgBlob);
-	let downloadLink = document.createElement("a");
+    let downloadLink = document.createElementNS(svg_NS,"a");
 	let downloadText = document.createElement("text");
 	downloadText.innerHTML = "Download";
 	downloadLink.appendChild(downloadText);
